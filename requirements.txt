@@ -1,0 +1,4 @@
+# bot-env. view README.md file for guide
+discord.py      
+python-dotenv
+mysql-connector-python
