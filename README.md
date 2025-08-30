@@ -13,7 +13,7 @@
     ``` 
 - Step 3
     ```
-    pip install -r requirements.txt
+    pip install -r ./txt/requirements.txt
     // make sure python is installed
     ``` 
 
@@ -21,4 +21,7 @@
 - Create a discord.log file
 - Create .env file
 - put the token inside your .env file
-- View the offical website of <a href="https://discordpy.readthedocs.io/en/stable/intro.html"> Discord.py</a>
+- View the official website of <a href="https://discordpy.readthedocs.io/en/stable/intro.html"> Discord.py</a>
+
+credits for photo / icon of the bot
+> rahmatnurohman3881

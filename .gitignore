@@ -1,4 +1,4 @@
+.idea/
 bot-env/
 .env
-.idea/
-discord.log
+txt/discord.log
