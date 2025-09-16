@@ -1,6 +1,7 @@
 import discord
 import logging
 import os
+import asyncio
 from discord.ext import commands
 from dotenv import load_dotenv
 
@@ -12,11 +13,6 @@ bot = commands.Bot(command_prefix='//', intents=intents)
 
 load_dotenv()
 token = os.getenv('DISCORD_TOKEN')
-
-
-@bot.event
-async def on_ready():
-    print(f'{bot.user} is now online!')
 
 @bot.event
 async def on_message(message):
@@ -81,4 +77,15 @@ async def schedule(ctx, *args): # for schedule command
 # async def setActivity():
 #     pass
 
-bot.run(token, log_handler=handler, log_level=logging.DEBUG)
+
+async def load():
+    for filename in os.listdir('./cogs/*'):
+        if filename.endswith('.py'):
+            await bot.load_extension(f'cogs{filename[:-3]}')    
+            
+async def main():
+        await load()
+        await bot.run(token, log_handler=handler, log_level=logging.DEBUG )
+        
+
+asyncio.run(main())
