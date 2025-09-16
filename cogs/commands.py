@@ -10,9 +10,7 @@ class Commands(commands.Cog):
         if msg.author == self.bot.user:
             return
         
-        await self.bot.process_commands(msg)
-        
-    @commands.command
+    @commands.command()
     async def showCmd(self, ctx): # for sending a guide
 
         embed = discord.Embed( title="📍 Class Companion Commands", description='''Use the `//` prefix before the command ''',color=discord.Colour.og_blurple())
@@ -24,7 +22,7 @@ class Commands(commands.Cog):
 
         await ctx.send(embed=embed)
         
-    @commands.command
+    @commands.command()
     async def schedule(self, ctx, *args): # for schedule command
 
         if ctx.guild is not None:

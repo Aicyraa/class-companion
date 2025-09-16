@@ -5,7 +5,7 @@ class Event(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
         
-    @commands.Cogs.listener()
+    @commands.Cog.listener()
     async def on_ready(self):
         print(f'{self.bot.user} is now online!')
         
