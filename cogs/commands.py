@@ -1,6 +1,7 @@
 import discord
 from discord.ext import commands
 from utils.sql_func import Query
+from utils.settings import Settings
 
 # Config file
 

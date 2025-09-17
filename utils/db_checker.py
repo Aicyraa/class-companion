@@ -19,25 +19,40 @@ class Checker:
                 print(f"Error ==> {err}")
 
     @staticmethod
-    async def check_table(cursor, tb):
+    async def check_table(cursor):
         try:
-            cursor.execute("SELECT {tb}")
-        except sql.Error as err:
-            if err.errno == errorcode.ER_NO_SUCH_TABLE:
-                Checker.create_tb(cursor, tb)
+            print('Checking Table!')
+            cursor.execute("SHOW TABLES LIKE 'schedules'")
+            result = cursor.fetchone();
+            if result:
+                print('Table exist!')
             else:
+                Checker.create_tb(cursor)
+                print('table created!')
+            
+        except sql.Error as err:
                 print(f"Error ==> {err}")
 
     @staticmethod
     def create_db(cursor, db: str):
         try:
+            print('Creating DB!')
             cursor.execute(f"CREATE DATABASE {db}")
         except sql.Error as err:
             print(f"An error occured while creating the database! ==> {err}")
 
     @staticmethod
-    def create_tb(cursor, tb: str):
+    def create_tb(cursor):
         try:
-            cursor.execute("CREATE TABLE {tb}")
+            print('Creating Table!')
+            cursor.execute(f'''
+                CREATE TABLE IF NOT EXISTS `schedules` (
+                id INT AUTO_INCREMENT PRIMARY KEY,
+                user_id INT NOT NULL,
+                event_day ENUM('Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday') NOT NULL,
+                event VARCHAR(55) NOT NULL,
+                time_of_event VARCHAR(20) NOT NULL
+            ); ''')
+
         except sql.Error as err:
-            print(f"An error occured while creating the database! ==> {err}")
+            print(f"An error occurred while creating the table! ==> {err}")

@@ -3,7 +3,7 @@ from mysql.connector import errorcode
 
 class Query:
     @staticmethod
-    def insert(cursor):
+    def insert(cursor, *args):
         pass
     
     @staticmethod

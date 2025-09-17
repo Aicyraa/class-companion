@@ -1,4 +1,5 @@
 import os
+import mysql.connector as sql
 from dotenv import load_dotenv
 load_dotenv()
 
@@ -10,5 +11,6 @@ class Settings:
     }
    
     token = os.getenv('TOKEN') 
-    db = 'Discord_Bot' 
-    tb_schedule = 'schedules'
+    db = os.getenv('DB_NAME')
+    cnx = sql.connect(**config) 
+    cursor = cnx.cursor() 

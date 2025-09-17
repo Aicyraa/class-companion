@@ -2,7 +2,6 @@ import discord
 # import logging 
 import os
 import asyncio
-import mysql.connector as sql
 from discord.ext import commands
 from utils.db_checker import Checker
 from utils.settings import Settings 
@@ -21,11 +20,8 @@ async def load():
 
 async def main():
   
-    cnx = sql.connect(**Settings.config) # 
-    cursor = cnx.cursor() # 
-
-    await Checker.check_db(cursor, Settings.db)
-    await Checker.check_table(cursor, Settings.tb_schedule)
+    await Checker.check_db(Settings.cursor, Settings.db)
+    await Checker.check_table(Settings.cursor)
     await load()
     await bot.start(Settings.token, reconnect=True)
     
