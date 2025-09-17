@@ -1,0 +1,14 @@
+import os
+from dotenv import load_dotenv
+load_dotenv()
+
+class Settings:
+
+    config = { #
+        'user': os.getenv('DB_USER'),
+        'password': os.getenv('DB_PASSWORD')
+    }
+   
+    token = os.getenv('TOKEN') 
+    db = 'Discord_Bot' 
+    tb_schedule = 'schedules'

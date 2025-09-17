@@ -1,5 +1,8 @@
 import discord
 from discord.ext import commands
+from utils.sql_func import Query
+
+# Config file
 
 class Commands(commands.Cog):
     def __init__(self, bot):
@@ -23,7 +26,7 @@ class Commands(commands.Cog):
         await ctx.send(embed=embed)
         
     @commands.command()
-    async def schedule(self, ctx, *args): # for schedule command
+    async def schedule(self, ctx, *args): # for schedule command        
 
         if ctx.guild is not None:
             embed = discord.Embed(title=f"{ctx.author.display_name or ctx.author.name}",description=f"A message has been sent to you!", color=discord.Colour.og_blurple())
@@ -49,6 +52,7 @@ class Commands(commands.Cog):
             else:
                 day, subj, time = userSchedule
                 schedule_set.add_field(name="", value=f"`𖥔 {day.upper()}`:  {subj},  {time}", inline=False)
+                Query.insert()
             
             await ctx.author.send(embed=schedule_set)
 
