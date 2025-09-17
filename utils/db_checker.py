@@ -1,7 +1,7 @@
 import mysql.connector as sql
 from mysql.connector import errorcode
 
-class Sql:
+class Checker:
     
     @staticmethod
     async def check_db(cursor, db):
@@ -13,10 +13,14 @@ class Sql:
                 print('Something is wrong with your DB!')
             elif err.errno == errorcode.ER_BAD_DB_ERROR:
                 print(f'{db} does not exist!')
-                Sql.create_db(cursor, db)
+                Checker.create_db(cursor, db)
                 print(f'{db} created!')
             else:
                 print(f'Error ==> {err}')   
+
+    @staticmethod
+    async def check_table():
+        pass
     
     @staticmethod
     def create_db(cursor, db: str):

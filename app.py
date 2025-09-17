@@ -5,7 +5,7 @@ import asyncio
 import mysql.connector as sql
 from discord.ext import commands
 from dotenv import load_dotenv
-from utils.db_checker import Sql
+from utils.db_checker import Checker
 
 # handler = logging.FileHandler( filename='./discord.log', encoding='utf-8', mode='w')
 
@@ -33,7 +33,7 @@ async def main():
     cnx = sql.connect(**config)
     cursor = cnx.cursor()
 
-    await Sql.check_db(cursor, db)
+    await Checker.check_db(cursor, db)
     await load()
     await bot.start(token, reconnect=True)
     
