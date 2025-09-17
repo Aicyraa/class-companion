@@ -3,10 +3,9 @@ import logging
 import os
 import asyncio
 import mysql.connector as sql
-from mysql.connector import errorcode
 from discord.ext import commands
 from dotenv import load_dotenv
-from utils.sql import Sql
+from utils.db_checker import Sql
 
 # handler = logging.FileHandler( filename='./discord.log', encoding='utf-8', mode='w')
 
