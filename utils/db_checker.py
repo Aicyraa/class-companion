@@ -1,6 +1,6 @@
 import mysql.connector as sql
 from mysql.connector import errorcode
-
+from utils.settings import Settings 
 class Checker:
 
     @staticmethod
@@ -20,6 +20,9 @@ class Checker:
 
     @staticmethod
     async def check_table(cursor):
+
+        cursor.execute(f'use {Settings.db}')
+
         try:
             print('Checking Table!')
             cursor.execute("SHOW TABLES LIKE 'schedules'")
@@ -35,6 +38,7 @@ class Checker:
 
     @staticmethod
     def create_db(cursor, db: str):
+
         try:
             print('Creating DB!')
             cursor.execute(f"CREATE DATABASE {db}")
@@ -43,15 +47,17 @@ class Checker:
 
     @staticmethod
     def create_tb(cursor):
+
+        
         try:
             print('Creating Table!')
             cursor.execute(f'''
                 CREATE TABLE IF NOT EXISTS `schedules` (
                 id INT AUTO_INCREMENT PRIMARY KEY,
-                user_id INT NOT NULL,
+                user_id BIGINT UNSIGNED NOT NULL,
                 event_day ENUM('Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday') NOT NULL,
                 event VARCHAR(55) NOT NULL,
-                time_of_event VARCHAR(20) NOT NULL
+                time_of_event TIME NOT NULL
             ); ''')
 
         except sql.Error as err:

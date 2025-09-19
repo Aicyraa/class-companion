@@ -46,14 +46,15 @@ class Commands(commands.Cog):
 
         for i in range(0, len(args), 3):
             userSchedule = args[i:i+3]
-            
+            print('Inside the loop!')
             if userSchedule[0].lower() not in ('monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday') or len(userSchedule) < 3:
                 await ctx.send(f'Invalid format! Check your format length or text! {len(userSchedule)} || {userSchedule[0]}')
                 continue
             else:
+                print('sending...')
+                Query.insert(Settings.cursor, ctx ,userSchedule)
                 day, subj, time = userSchedule
                 schedule_set.add_field(name="", value=f"`𖥔 {day.upper()}`:  {subj},  {time}", inline=False)
-                Query.insert()
             
             await ctx.author.send(embed=schedule_set)
 
