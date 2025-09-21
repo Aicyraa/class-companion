@@ -33,10 +33,12 @@ async def load():
 
 async def main():
   
-    await Checker.check_db(Settings.cursor, Settings.db)
-    await Checker.check_table(Settings.cursor)
+    await Checker.check_db( Settings.db)
+    await Checker.check_table()
     await load()
     await bot.start(Settings.token, reconnect=True)
+
+    Settings.connection().close()
     
 if __name__ == "__main__":
      asyncio.run(main())

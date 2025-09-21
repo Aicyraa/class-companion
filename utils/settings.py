@@ -5,12 +5,14 @@ load_dotenv()
 
 class Settings:
 
-    config = { #
+    config = { 
         'user': os.getenv('DB_USER'),
         'password': os.getenv('DB_PASSWORD')
     }
-   
+
+    @staticmethod
+    def connection():
+        return sql.connect(**Settings.config)
+
     token = os.getenv('TOKEN') 
     db = os.getenv('DB_NAME')
-    cnx = sql.connect(**config) 
-    cursor = cnx.cursor() 

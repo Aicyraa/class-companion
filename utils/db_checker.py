@@ -4,7 +4,11 @@ from utils.settings import Settings
 class Checker:
 
     @staticmethod
-    async def check_db(cursor, db):
+    async def check_db(db):
+
+        cnx = Settings.connection()
+        cursor = cnx.cursor()
+
         try:
             print("Checking DB!")
             cursor.execute(f"USE {db}")
@@ -17,10 +21,12 @@ class Checker:
                 print(f"{db} created!")
             else:
                 print(f"Error ==> {err}")
-
+      
     @staticmethod
-    async def check_table(cursor):
+    async def check_table():
 
+        cnx = Settings.connection()
+        cursor = cnx.cursor()
         cursor.execute(f'use {Settings.db}')
 
         try:
@@ -44,11 +50,13 @@ class Checker:
             cursor.execute(f"CREATE DATABASE {db}")
         except sql.Error as err:
             print(f"An error occured while creating the database! ==> {err}")
+        finally:
+            cursor.close()                
+
 
     @staticmethod
     def create_tb(cursor):
 
-        
         try:
             print('Creating Table!')
             cursor.execute(f'''
@@ -62,3 +70,6 @@ class Checker:
 
         except sql.Error as err:
             print(f"An error occurred while creating the table! ==> {err}")
+        finally:
+            cursor.close()                
+
