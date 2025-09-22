@@ -6,7 +6,6 @@ from discord.ext import commands
 from utils.db_checker import Checker
 from utils.settings import Settings 
 
-# handler = logging.FileHandler( filename='./discord.log', encoding='utf-8', mode='w')
 
 logging.basicConfig(
     level=logging.INFO,  # Change to DEBUG if you want more details
