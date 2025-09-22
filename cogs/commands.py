@@ -52,11 +52,11 @@ class Commands(commands.Cog):
                 continue
             else:
                 print('sending...')
-                Query.insert(ctx ,userSchedule)
+                Query.insert(ctx, userSchedule)
                 day, subj, time = userSchedule
                 schedule_set.add_field(name="", value=f"`𖥔 {day.upper()}`:  {subj},  {time}", inline=False)
             
-            await ctx.author.send(embed=schedule_set)
+        await ctx.author.send(embed=schedule_set)
 
     @commands.command    
     async def viewSchedule(self):
