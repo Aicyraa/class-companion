@@ -3,22 +3,32 @@ from utils.settings import Settings
 
 class Query:
     @staticmethod
-    def insert(ctx, args):
+    def insert(ctx, args: tuple):
 
         cnx = Settings.connection()
         cursor = cnx.cursor()
+        uniqueID = ctx.author.id
+        day, event, time = args
 
         try:
-            cursor.execute(f'''
-            INSERT INTO schedules (user_id, event_day, event, time_of_event)
-            VALUES (%s, %s , %s ,%s); ''', (ctx.author.id, args[0], args[1], args[2]))
-            Settings.connection()
+            cursor.execute(f'USE {Settings.db}')
+            cursor.execute('SELECT * FROM user WHERE user_discord_id = %s', (uniqueID,))
+            if not cursor.fetchone():
+                print('success?')
+                cursor.execute('INSERT INTO user (user_discord_id) VALUES (%s)', (uniqueID, ))
+                cnx.commit()
+
+            cursor.execute('''
+                    INSERT INTO schedules (user_discord_id, event_day, event, event_time)
+                    VALUES (%s, %s, %s, %s ); ''', (uniqueID, day, event, time))
+            cnx.commit()
+            print('success???')
+
         except sql.Error as err:
-            print(f'Error ==> {err}')
+            print(f'Error while inserting data! ==> {err}')
         finally:
             cursor.close()
-
-        print('Send!??')    
+            cnx.close()
     
     @staticmethod
     def fetch():
