@@ -1,15 +1,18 @@
 import mysql.connector as sql
+from datetime import datetime
 from utils.settings import Settings
 
 class Query:
+
     @staticmethod
     def insert(ctx, args: tuple):
 
         cnx = Settings.connection()
         cursor = cnx.cursor()
         uniqueID = ctx.author.id
-        day, event, time = args
-
+        day, event, tFormat = args
+        time = datetime.strptime(tFormat, "%I%p").time() 
+    
         try:
             cursor.execute(f'USE {Settings.db}')
             cursor.execute('SELECT * FROM user WHERE user_discord_id = %s', (uniqueID,))
