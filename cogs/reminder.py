@@ -1,6 +1,7 @@
 import pytz
 from datetime import datetime, time
 from discord.ext import tasks, commands
+from utils.sql_func_reminder import Reminder_Query as rq
 
 class Reminder(commands.Cog):
 
@@ -19,11 +20,12 @@ class Reminder(commands.Cog):
         time, _ = datetime.now(self.ph_time).strftime("%I:%M %p").split(' ')
         hours, __ = time.split(':')
 
-        if int(hours) == 8 and not self.stopper:
+        if int(hours) == 9 and not self.stopper:
             self.stopper = True
-            print('Working')
+            
+            rq.midnight_remind()
 
-        if not int(hours) == 0:
+        if not int(hours) == 9:
             self.stopper = False
 
 async def setup(bot):
