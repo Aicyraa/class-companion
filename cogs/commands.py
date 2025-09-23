@@ -2,7 +2,7 @@ import discord
 import re
 from discord.ext import commands
 from utils.sql_func import Query
-from utils.settings import Settings
+from utils.config import Settings
 
 # Config file
 

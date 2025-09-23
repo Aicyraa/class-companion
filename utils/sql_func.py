@@ -1,6 +1,6 @@
 import mysql.connector as sql
 from datetime import datetime
-from utils.settings import Settings
+from utils.config import Settings
 
 class Query:
 
