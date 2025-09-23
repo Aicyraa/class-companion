@@ -1,4 +1,5 @@
 import discord
+import re
 from discord.ext import commands
 from utils.sql_func import Query
 from utils.settings import Settings
@@ -38,7 +39,7 @@ class Commands(commands.Cog):
             embed.set_thumbnail(url=self.bot.user.avatar)
             embed.add_field(name="", value="`𖥔 Day`:  ( Monday - Saturday )", inline=False)
             embed.add_field(name="", value=" `𖥔 Subject`:  Users Subject for that day", inline=False)
-            embed.add_field(name="", value="`𖥔 Time`:  12-Hour AM/PM format", inline=False)
+            embed.add_field(name="", value="`𖥔 Time`:  12-Hour AM/PM format e.g (1PM || 1AM)", inline=False)
             await ctx.author.send(embed=embed)
             return
 
@@ -46,17 +47,19 @@ class Commands(commands.Cog):
 
         for i in range(0, len(args), 3):
             userSchedule = args[i:i+3]
-            print('Inside the loop!')
+
             if userSchedule[0].lower() not in ('monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday') or len(userSchedule) < 3:
                 await ctx.send(f'Invalid format! Check your format length or text! {len(userSchedule)} || {userSchedule[0]}')
                 continue
+            elif not re.match(r"^(1[0-2]|0?[1-9])(AM|PM)$", userSchedule[2], re.IGNORECASE):
+                await ctx.send(f"Invalid time format: `{userSchedule[2]}`. Use like `1PM`, `11AM`.")
+                continue
             else:
-                print('sending...')
-                Query.insert(ctx ,userSchedule)
+                Query.insert(ctx, userSchedule)
                 day, subj, time = userSchedule
                 schedule_set.add_field(name="", value=f"`𖥔 {day.upper()}`:  {subj},  {time}", inline=False)
             
-            await ctx.author.send(embed=schedule_set)
+        await ctx.author.send(embed=schedule_set)
 
     @commands.command    
     async def viewSchedule(self):
