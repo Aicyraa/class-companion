@@ -2,7 +2,7 @@ import discord
 import re
 from discord.ext import commands
 from utils.sql_func import Query
-from utils.settings import Settings
+
 
 # Config file
 
@@ -72,6 +72,7 @@ class Commands(commands.Cog):
     @commands.command    
     async def setActivity(self): # for sever owner or admins
         pass
+
 
 async def setup(bot):
     await bot.add_cog(Commands(bot))

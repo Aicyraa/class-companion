@@ -4,7 +4,7 @@ import os
 import asyncio
 from discord.ext import commands
 from utils.db_checker import Checker
-from utils.settings import Settings 
+from utils.config import Settings 
 
 
 logging.basicConfig(
