@@ -70,9 +70,9 @@ class Commands(commands.Cog):
         pass    
 
     @commands.command    
-    async def setActivity(self): # for sever owner or admins
-        pass
+    async def activity(self): # for sever owner or admins
+        pass        
 
 
-async def setup(bot):
+async def setup(bot):        
     await bot.add_cog(Commands(bot))
