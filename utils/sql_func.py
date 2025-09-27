@@ -5,7 +5,7 @@ from utils.config import Settings
 class Query:
 
     @staticmethod
-    def insert(ctx, args: tuple):
+    def insert_schedule(ctx, args: tuple):
 
         cnx = Settings.connection()
         cursor = cnx.cursor()
@@ -43,4 +43,8 @@ class Query:
 
     @staticmethod
     def delete():
+        pass
+
+    @staticmethod
+    def insert_activity():
         pass
