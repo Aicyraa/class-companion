@@ -66,7 +66,7 @@ class Checker:
                 CREATE TABLE IF NOT EXISTS `schedules` (
                 id INT AUTO_INCREMENT PRIMARY KEY,
                 user_discord_id BIGINT UNSIGNED NOT NULL,
-                event_day ENUM('Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday') NOT NULL,
+                event_day ENUM('Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday') NOT NULL,
                 event VARCHAR(55) NOT NULL,
                 event_time TIME NOT NULL,
                            
