@@ -1,7 +1,7 @@
 import discord
 import re
 from discord.ext import commands
-from utils.sql_func import Query
+from utils.sql_func_helpers import Query
 from utils.sql_func_reminder import Reminder_Query
 
 
@@ -105,14 +105,27 @@ class Commands(commands.Cog):
             "name": "《🔔》event-schedule",
             "permission": {
                 ctx.guild.default_role: discord.PermissionOverwrite(
-                    view_channel=True, send_messages=False
-                )
-            },
+                view_channel=True,
+                send_messages=False,
+                create_public_threads=False,
+                create_private_threads=False,
+                send_messages_in_threads=False
+            ),
+                ctx.guild.me: discord.PermissionOverwrite(
+                view_channel=True,
+                send_messages=True,
+                create_public_threads=True,
+                create_private_threads=True,
+                send_messages_in_threads=True,
+                mention_everyone=True
+            )},
             "get": discord.utils.get(ctx.guild.text_channels, name="《🔔》event-schedule"),
             "id": None,
         }
 
+
         if not config["get"]:  # for creating the channel
+            print(f'creating of channel')
             channel = await ctx.guild.create_text_channel(
                 name=config["name"], overwrites=config["permission"]
             )
