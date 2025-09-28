@@ -3,7 +3,7 @@ import logging
 import os
 import asyncio
 from discord.ext import commands
-from utils.db_checker import Checker
+from utils.sql_func_checker import Checker
 from utils.config import Settings 
 
 
@@ -17,8 +17,7 @@ logging.basicConfig(
     ]
 )
 
-logger = logging.getLogger("discord")  #
-
+logger = logging.getLogger("discord")  
 
 intents = discord.Intents.default()
 intents.message_content = True
@@ -33,9 +32,9 @@ async def load():
 
 async def main():
   
-    await Checker.check_db( Settings.db)
-    await Checker.check_table()
-    await load()
+    await Checker.check_db( Settings.db) # for checking the database
+    await Checker.check_table() # for checking the table
+    await load() # loading cogs
     await bot.start(Settings.token, reconnect=True)
 
     Settings.connection().close()

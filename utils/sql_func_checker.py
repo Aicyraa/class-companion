@@ -48,30 +48,28 @@ class Checker:
                 print("Tables does not exist or not complete!")
                 Checker.create_tb(cursor)
 
-        except sql.Error as err:
-            print(f"Error ==> {err}")
+        except sql.Error as err: print(f"Error ==> {err}")
 
     @staticmethod
     def create_tb(cursor):
 
         try:
-
-            # for users
+            # for users table
             cursor.execute(
                 """
                 CREATE TABLE IF NOT EXISTS `user` (
                 user_id INT AUTO_INCREMENT UNIQUE,
                 user_discord_id BIGINT UNSIGNED PRIMARY KEY,
                 registered_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP               
-            ); """ )
+                ); """ )
 
-            # for guild table
+            # for guilds table
             cursor.execute(
                 """
                 CREATE TABLE IF NOT EXISTS `guilds` (
-                    id INT AUTO_INCREMENT UNIQUE,
-                    guild_id BIGINT UNSIGNED PRIMARY KEY,
-                    registered_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP      
+                id INT AUTO_INCREMENT UNIQUE,
+                guild_id BIGINT UNSIGNED PRIMARY KEY,
+                registered_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP      
                 ); """ )
 
             # for schedules
@@ -85,8 +83,7 @@ class Checker:
                 event_time TIME NOT NULL,
                            
                 CONSTRAINT fk_parent FOREIGN KEY(user_discord_id) REFERENCES user(user_discord_id)
-            ); """
-            )
+            ); """ )
 
             # for activities
             cursor.execute(
@@ -98,12 +95,10 @@ class Checker:
                 expiry_date DATETIME NOT NULL,
                 
                 CONSTRAINT fk_parent_guild FOREIGN KEY(guild_id) REFERENCES guilds(guild_id)
-            ); """
-            )
+            ); """ )
 
             print("Table created!")
 
-        except sql.Error as err:
-            print(f"An error occurred while creating the table! ==> {err}")
+        except sql.Error as err: print(f"An error occurred while creating the table! ==> {err}")
         finally:
             cursor.close()

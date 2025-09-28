@@ -9,8 +9,9 @@ class Query:
 
         cnx = Settings.connection()
         cursor = cnx.cursor()
+
         uniqueID = ctx.author.id
-        day, event, tFormat = args
+        day, event, tFormat = args # unpacked args
         time = datetime.strptime(tFormat, "%I%p").time() 
     
         try:
@@ -21,13 +22,15 @@ class Query:
                 cursor.execute('INSERT INTO user (user_discord_id) VALUES (%s)', (uniqueID, ))
                 cnx.commit()
 
-            cursor.execute('''
+            cursor.execute(
+                    '''
                     INSERT INTO schedules (user_discord_id, event_day, event, event_time)
-                    VALUES (%s, %s, %s, %s ); ''', (uniqueID, day, event, time))
+                    VALUES (%s, %s, %s, %s ); 
+                    ''', (uniqueID, day, event, time))
+            
             cnx.commit()
 
-        except sql.Error as err:
-            print(f'Error while inserting data! ==> {err}')
+        except sql.Error as err: print(f'Error while inserting data! ==> {err}')
         finally:
             cursor.close()
             cnx.close()
@@ -49,6 +52,7 @@ class Query:
         
         cnx = Settings.connection()
         cursor = cnx.cursor()
+        
         cursor.execute(f'USE {Settings.db}')
 
         try:
@@ -57,13 +61,14 @@ class Query:
                 cursor.execute('''INSERT INTO guilds (guild_id) VALUES (%s)''', (guild_id, ))
                 cnx.commit()
 
-            cursor.execute( """
-                            INSERT INTO activities (guild_id, activity_details, expiry_date)
-                            VALUES (%s, %s, %s) """, (guild_id, event, expiry.strftime("%Y-%m-%d %H:%M:%S")))
+            cursor.execute(
+                """
+                INSERT INTO activities (guild_id, activity_details, expiry_date)
+                VALUES (%s, %s, %s) """, (guild_id, event, expiry.strftime("%Y-%m-%d %H:%M:%S")))
+            
             cnx.commit()
 
-        except sql.Error as err:
-            print(f"Database Error: {err}")
+        except sql.Error as err: print(f"Error occur while inserting activies: {err}")
         finally:
              cursor.close()
              cnx.close()
