@@ -2,6 +2,7 @@ import discord
 import re
 from discord.ext import commands
 from utils.sql_func import Query
+from utils.sql_func_reminder import Reminder_Query
 
 
 # Config file
@@ -41,7 +42,7 @@ class Commands(commands.Cog):
                 description=f"A message has been sent to you!",
                 color=discord.Colour.og_blurple(),
             )
-            await ctx.send(embed=embed)
+            await ctx.send(embed=embed,  delete_after=1000)
 
         if not args or len(args) < 2:
             embed = discord.Embed(
@@ -74,12 +75,10 @@ class Commands(commands.Cog):
                 )
                 or len(userSchedule) < 3
             ):
-                await ctx.send(
-                    f"Invalid format! Check your format length or text! {len(userSchedule)} || {userSchedule[0]}"
-                )
+                await ctx.send(f"Invalid format! Check your format length or text! {len(userSchedule)} || {userSchedule[0]}",  delete_after=10)
                 continue
             elif not re.match( r"^(1[0-2]|0?[1-9])(AM|PM)$", userSchedule[2], re.IGNORECASE):
-                await ctx.send(f"Invalid time format: `{userSchedule[2]}`. Use like `1PM`, `11AM`.")
+                await ctx.send(f"Invalid time format: `{userSchedule[2]}`. Use like `1PM`, `11AM`.", delete_after=10)
                 continue
             else:
                 Query.insert_schedule(ctx, userSchedule)
@@ -122,19 +121,19 @@ class Commands(commands.Cog):
             return
 
         if len(message) < 2:  # Needs event + duration
-            await ctx.send('❌ Invalid parameters! Usage: `//activity "Event Name" 1H`')
+            await ctx.send('❌ Invalid parameters! Usage: `//activity "Event Name" 1H`', delete_after=10)
             return
     
         duration = message[-1]         # Example: "1H"
         event = " ".join(message[:-1]) # Example: "Math Homework"
 
         # --- CONVERT TO EXPIRY ---
-        expiry = self.convert_to_expiry(duration)
+        expiry = Reminder_Query.convert_to_expiry(duration)
         if not expiry:
-            await ctx.send(f"❌ Invalid duration format: `{duration}` (use 1D, 2H, 30M)")
+            await ctx.send(f"❌ Invalid duration format: `{duration}` (use 1D, 2H, 30M)", delete_after=10)
             return
 
-        Query.insert_activity(ctx.guild.id, event=event, expiry=expiry)
+        Query.insert_activity(ctx.guild.id, event, expiry)
 
 async def setup(bot):
     await bot.add_cog(Commands(bot))
