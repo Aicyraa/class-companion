@@ -96,9 +96,7 @@ class Commands(commands.Cog):
         pass
 
     @commands.command()
-    @commands.has_permissions(
-        administrator=True, manage_channels=True, manage_guild=True
-    )
+    @commands.has_permissions(administrator=True, manage_channels=True, manage_guild=True)
     async def activity(self, ctx, *message):  # for sever owner or admins
 
         config = {
@@ -125,10 +123,7 @@ class Commands(commands.Cog):
 
 
         if not config["get"]:  # for creating the channel
-            print(f'creating of channel')
-            channel = await ctx.guild.create_text_channel(
-                name=config["name"], overwrites=config["permission"]
-            )
+            channel = await ctx.guild.create_text_channel(name=config["name"], overwrites=config["permission"])
             config["id"] = channel.id
             await ctx.send(f'{config["name"]} is created!', delete_after=100)
             return
