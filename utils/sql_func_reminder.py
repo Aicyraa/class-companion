@@ -1,7 +1,8 @@
 import mysql.connector as sql
 import pytz
+import re
 from utils.config import Settings
-from datetime import datetime
+from datetime import datetime, timedelta
 
 
 class Reminder_Query:
@@ -32,7 +33,6 @@ class Reminder_Query:
                 (user_id, today)
             )
 
-
             for schedules in list(cursor.fetchall()):
                 schedules = list(schedules)
                 time = Reminder_Query.process_time(schedules.pop(-1))
@@ -52,3 +52,24 @@ class Reminder_Query:
         ampm = "AM" if hours_24 < 12 else "PM"
         fixed_format = f"{hours_12:02d}:{minutes:02d} {ampm}"
         return fixed_format
+
+
+    @staticmethod
+    def convert_to_expiry(duration: str) -> datetime:
+        now = datetime.now()
+        duration = duration.upper().strip()
+
+        match = re.match(r"(\d+)([DHM])", duration)
+        if not match:
+            return None
+
+        value, unit = int(match.group(1)), match.group(2)
+
+        if unit == "D":
+            return now + timedelta(days=value)
+        elif unit == "H":
+            return now + timedelta(hours=value)
+        elif unit == "M":
+            return now + timedelta(minutes=value)
+
+        return None
