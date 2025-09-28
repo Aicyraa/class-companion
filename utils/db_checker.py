@@ -43,8 +43,9 @@ class Checker:
         try:
 
             cursor.execute("SHOW TABLES")
-            if not cursor.fetchall():
-                print("Tables not exist!")
+            result = cursor.fetchall()
+            if not result or len(result) < 5:
+                print("Tables does not exist or not complete!")
                 Checker.create_tb(cursor)
 
         except sql.Error as err:
@@ -62,19 +63,16 @@ class Checker:
                 user_id INT AUTO_INCREMENT UNIQUE,
                 user_discord_id BIGINT UNSIGNED PRIMARY KEY,
                 registered_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP               
-            ) """
-            )
+            ); """ )
 
             # for guild table
             cursor.execute(
                 """
-                CREATE TABLE IF NOT EXIST `guilds` (
-                    id AUTO_INCREMENT UNIQUE,
+                CREATE TABLE IF NOT EXISTS `guilds` (
+                    id INT AUTO_INCREMENT UNIQUE,
                     guild_id BIGINT UNSIGNED PRIMARY KEY,
                     registered_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP      
-                )
-            """
-            )
+                ); """ )
 
             # for schedules
             cursor.execute(
@@ -94,12 +92,12 @@ class Checker:
             cursor.execute(
                 """ 
                 CREATE TABLE IF NOT EXISTS `activities` (
-                id AUTO_INCREMENT PRIMARY KEY,
+                id INT AUTO_INCREMENT PRIMARY KEY,
                 guild_id BIGINT UNSIGNED NOT NULL,
-                activity_details VARCHAR(150) NOT NULL.
-                expiry_date DATETIME NOT NULL
+                activity_details VARCHAR(150) NOT NULL,
+                expiry_date DATETIME NOT NULL,
                 
-                CONSTAIN fk_parent FOREIGN KEY(guild_id) REFERENCES guilds(guild_id)
+                CONSTRAINT fk_parent_guild FOREIGN KEY(guild_id) REFERENCES guilds(guild_id)
             ); """
             )
 
