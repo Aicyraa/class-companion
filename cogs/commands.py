@@ -50,23 +50,13 @@ class Commands(commands.Cog):
                 color=discord.Colour.og_blurple(),
             )
             embed.set_thumbnail(url=self.bot.user.avatar)
-            embed.add_field(
-                name="", value="`𖥔 Day`:  ( Monday - Saturday )", inline=False
-            )
-            embed.add_field(
-                name="", value=" `𖥔 Subject`:  Users Subject for that day", inline=False
-            )
-            embed.add_field(
-                name="",
-                value="`𖥔 Time`:  12-Hour AM/PM format e.g (1PM || 1AM)",
-                inline=False,
-            )
+            embed.add_field(name="", value="`𖥔 Day`:  ( Monday - Saturday )", inline=False)
+            embed.add_field(name="", value=" `𖥔 Subject`:  Users Subject for that day", inline=False)
+            embed.add_field(name="",value="`𖥔 Time`:  12-Hour AM/PM format e.g (1PM || 1AM)",inline=False,)
             await ctx.author.send(embed=embed)
             return
 
-        schedule_set = discord.Embed(
-            title="⌛ Schedule is set!", color=discord.Colour.og_blurple()
-        )
+        schedule_set = discord.Embed(title="⌛ Schedule is set!", color=discord.Colour.og_blurple())
 
         for i in range(0, len(args), 3):
             userSchedule = args[i : i + 3]
@@ -80,7 +70,7 @@ class Commands(commands.Cog):
                     "thursday",
                     "friday",
                     "saturday",
-                    "sunday"
+                    "sunday",
                 )
                 or len(userSchedule) < 3
             ):
@@ -88,19 +78,13 @@ class Commands(commands.Cog):
                     f"Invalid format! Check your format length or text! {len(userSchedule)} || {userSchedule[0]}"
                 )
                 continue
-            elif not re.match(
-                r"^(1[0-2]|0?[1-9])(AM|PM)$", userSchedule[2], re.IGNORECASE
-            ):
-                await ctx.send(
-                    f"Invalid time format: `{userSchedule[2]}`. Use like `1PM`, `11AM`."
-                )
+            elif not re.match( r"^(1[0-2]|0?[1-9])(AM|PM)$", userSchedule[2], re.IGNORECASE):
+                await ctx.send(f"Invalid time format: `{userSchedule[2]}`. Use like `1PM`, `11AM`.")
                 continue
             else:
                 Query.insert_schedule(ctx, userSchedule)
                 day, subj, time = userSchedule
-                schedule_set.add_field(
-                    name="", value=f"`𖥔 {day.upper()}`:  {subj},  {time}", inline=False
-                )
+                schedule_set.add_field(name="", value=f"`𖥔 {day.upper()}`:  {subj},  {time}", inline=False)
 
         await ctx.author.send(embed=schedule_set)
 
@@ -113,38 +97,44 @@ class Commands(commands.Cog):
         pass
 
     @commands.command()
-    @commands.has_permissions(administrator=True, manage_channels=True, manage_guild=True)
+    @commands.has_permissions(
+        administrator=True, manage_channels=True, manage_guild=True
+    )
     async def activity(self, ctx, *message):  # for sever owner or admins
 
         config = {
             "name": "《🔔》event-schedule",
-            "permission": {ctx.guild.default_role: discord.PermissionOverwrite(view_channel=True, send_messages=False)}, 
+            "permission": {
+                ctx.guild.default_role: discord.PermissionOverwrite(
+                    view_channel=True, send_messages=False
+                )
+            },
             "get": discord.utils.get(ctx.guild.text_channels, name="《🔔》event-schedule"),
             "id": None,
         }
 
-
-        if not config['get']: # for creating the channel
-            channel = await ctx.guild.create_text_channel(name=config['name'], overwrites=config["permission"])
-            config['id'] = channel.id
+        if not config["get"]:  # for creating the channel
+            channel = await ctx.guild.create_text_channel(
+                name=config["name"], overwrites=config["permission"]
+            )
+            config["id"] = channel.id
             await ctx.send(f'{config["name"]} is created!', delete_after=100)
-            return 
-        elif config['get'] and not message[:-1] and not message[-1]:
-            await ctx.send(f'Invalid parameter!')
             return
-        
-        time, type = list(message[-1]) # time and type 
-        event = " ".join(message[:-1]) # for event message
 
-        if type.lower() not in ('d', 'h', 'm'): # argument validation
-            await ctx.send(f'Invalid duration time! {time}')
+        if len(message) < 2:  # Needs event + duration
+            await ctx.send('❌ Invalid parameters! Usage: `//activity "Event Name" 1H`')
             return
-        else:
-            pass    
+    
+        duration = message[-1]         # Example: "1H"
+        event = " ".join(message[:-1]) # Example: "Math Homework"
 
+        # --- CONVERT TO EXPIRY ---
+        expiry = self.convert_to_expiry(duration)
+        if not expiry:
+            await ctx.send(f"❌ Invalid duration format: `{duration}` (use 1D, 2H, 30M)")
+            return
 
-
-
+        Query.insert_activity(ctx.guild.id, event=event, expiry=expiry)
 
 async def setup(bot):
     await bot.add_cog(Commands(bot))
