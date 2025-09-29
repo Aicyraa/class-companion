@@ -1,6 +1,8 @@
 import mysql.connector as sql
 from mysql.connector import errorcode
 from utils.config import Settings
+
+
 class Checker:
 
     @staticmethod
@@ -19,64 +21,84 @@ class Checker:
                 Checker.create_db(cursor, db)
             else:
                 print(f"Error ==> {err}")
-      
+
     @staticmethod
     def create_db(cursor, db: str):
 
         try:
             cursor.execute(f"CREATE DATABASE {db}")
-            print('DB created!')
+            print("DB created!")
         except sql.Error as err:
             print(f"An error occured while creating the database! ==> {err}")
         finally:
-            cursor.close()                
+            cursor.close()
 
     @staticmethod
     async def check_table():
 
         cnx = Settings.connection()
         cursor = cnx.cursor()
-        cursor.execute(f'use {Settings.db}')
+        cursor.execute(f"use {Settings.db}")
 
         try:
 
-            cursor.execute("SHOW TABLES")
-            if not cursor.fetchall():
-                print('Tables not exist!')
+            cursor.execute("SHOW TABLES")   
+            result = cursor.fetchall()
+            if not result or len(result) < 2:
+                print("Tables does not exist or not complete!")
                 Checker.create_tb(cursor)
-              
-        except sql.Error as err:
-                print(f"Error ==> {err}")
+
+        except sql.Error as err: print(f"Error ==> {err}")
 
     @staticmethod
     def create_tb(cursor):
 
         try:
-
-            print('Creating table')
-
-            cursor.execute('''
+            # for users table
+            cursor.execute(
+                """
                 CREATE TABLE IF NOT EXISTS `user` (
                 user_id INT AUTO_INCREMENT UNIQUE,
                 user_discord_id BIGINT UNSIGNED PRIMARY KEY,
                 registered_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP               
-            ) ''')
+                ); """ )
 
-            cursor.execute('''
+            # for guilds table
+            cursor.execute(
+                """
+                CREATE TABLE IF NOT EXISTS `guilds` (
+                id INT AUTO_INCREMENT UNIQUE,
+                guild_id BIGINT UNSIGNED PRIMARY KEY,
+                registered_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP      
+                ); """ )
+
+            # for schedules
+            cursor.execute(
+                """
                 CREATE TABLE IF NOT EXISTS `schedules` (
                 id INT AUTO_INCREMENT PRIMARY KEY,
                 user_discord_id BIGINT UNSIGNED NOT NULL,
-                event_day ENUM('Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday') NOT NULL,
+                event_day ENUM('Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday') NOT NULL,
                 event VARCHAR(55) NOT NULL,
                 event_time TIME NOT NULL,
                            
                 CONSTRAINT fk_parent FOREIGN KEY(user_discord_id) REFERENCES user(user_discord_id)
-            ); ''')
+            ); """ )
 
-            print('Table created!')
+            # for activities
+            cursor.execute(
+                """ 
+                CREATE TABLE IF NOT EXISTS `activities` (
+                id INT AUTO_INCREMENT PRIMARY KEY,
+                guild_id BIGINT UNSIGNED NOT NULL,
+                activity_details VARCHAR(150) NOT NULL,
+                expiry_date DATETIME NOT NULL,
+                
+                CONSTRAINT fk_parent_guild FOREIGN KEY(guild_id) REFERENCES guilds(guild_id)
+            ); """ )
 
-        except sql.Error as err:
-            print(f"An error occurred while creating the table! ==> {err}")
+            print("Table created!")
+
+        except sql.Error as err: print(f"An error occurred while creating the table! ==> {err}")
         finally:
-            cursor.close()                
-
+            cursor.close()
