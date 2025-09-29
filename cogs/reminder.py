@@ -28,7 +28,7 @@ class Reminder(commands.Cog):
 
         hours, minutes, today = datetime.now(self.ph_time).strftime("%I %M %A").split(' ') # for fetching the current time hours, minutes day
 
-        if int(hours) + 12 == 18 and int(minutes) < 60 and not self.stopper :
+        if int(hours) + 12 == 19 and int(minutes) < 60 and not self.stopper :
            
             self.stopper = True 
 
@@ -44,7 +44,7 @@ class Reminder(commands.Cog):
         
                 await user.send(embed=embed)
 
-        if not int(hours) + 12 == 18:
+        if not int(hours) + 12 == 19:
             self.stopper = False
 
     @tasks.loop(minutes=1)
