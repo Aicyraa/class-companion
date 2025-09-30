@@ -26,25 +26,28 @@ class Reminder(commands.Cog):
     @tasks.loop(minutes=1) # loops for sending and reminding students their schedule
     async def remind_schedule(self):
 
+        counter = 1        
         hours, minutes, today = datetime.now(self.ph_time).strftime("%I %M %A").split(' ') # for fetching the current time hours, minutes day
 
-        if int(hours) + 12 == 19 and int(minutes) < 60 and not self.stopper :
+        if int(hours) == 11 and int(minutes) < 60 and not self.stopper :
            
             self.stopper = True 
-
             result = query.schedule_remind()
+            
             for user_id, event in result.items():
             
                 user = await self.bot.fetch_user(user_id)  # API call
-                embed = discord.Embed(title=f'Hello, {user}', description=f"Here is your schedule for {today}!" if len(event) < 2 else f"Here is your schedules for {today}!", colour=discord.Colour.brand_red())       
+                embed = discord.Embed(title=f'📌 Hello, {user}❗', description=f"Here is your schedule for **`{today}`**  🗺️." if len(event) < 2 else f"Here is your schedules for **`{today}`**  🗺️.", colour=discord.Colour.brand_red())       
                
                 if event:
                     for schedule in event:
-                        embed.add_field(name=f'{schedule[1]}', value=f'{schedule[0]}', inline=False)
-        
+                        print(f'Type, {type(schedule[0])},  {type(schedule[1])}, ==> {schedule} ')
+                        embed.add_field(name=f'**`Schedule {counter}`** ⏰', value=f'> Time:   **{schedule[1][1:]}**\n> Schedule:   **{schedule[0]}** ' if schedule[1].startswith('0') else f'> Time:   **{schedule[1]}**\n> Schedule:   **{schedule[0]}** ', inline=False)
+                        counter += 1
+                    counter = 0
                 await user.send(embed=embed)
 
-        if not int(hours) + 12 == 19:
+        if not int(hours) == 11:
             self.stopper = False
 
     @tasks.loop(minutes=1)
