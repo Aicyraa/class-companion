@@ -30,7 +30,6 @@ class Reminder(commands.Cog):
         hours, minutes, today = datetime.now(self.ph_time).strftime("%I %M %A").split(' ') # for fetching the current time hours, minutes day
 
         if int(hours) == 11 and int(minutes) < 60 and not self.stopper :
-           
             self.stopper = True 
             result = query.schedule_remind()
             
@@ -38,7 +37,9 @@ class Reminder(commands.Cog):
             
                 user = await self.bot.fetch_user(user_id)  # API call
                 embed = discord.Embed(title=f'📌 Hello, {user}❗', description=f"Here is your schedule for **`{today}`**  🗺️." if len(event) < 2 else f"Here is your schedules for **`{today}`**  🗺️.", colour=discord.Colour.brand_red())       
-               
+                embed.set_image(url='http://bestanimations.com/HomeOffice/Clocks/Alarm/funny-alarm-clock-animated-gif-2.gif')
+                embed.set_footer(text='Class Companion', icon_url=self.bot.user.display_avatar.url)
+                
                 if event:
                     for schedule in event:
                         print(f'Type, {type(schedule[0])},  {type(schedule[1])}, ==> {schedule} ')
@@ -51,7 +52,7 @@ class Reminder(commands.Cog):
             self.stopper = False
 
     @tasks.loop(minutes=1)
-    async def remind_activites(self):
+    async def remind_activites(self): # for reminding activities
         
         for guild_id, events in query.activity_remind().items():
             
@@ -59,19 +60,26 @@ class Reminder(commands.Cog):
             channels = await guild.fetch_channels()
             channel = discord.utils.get(channels, name="《🔔》event-schedule")
             
+          
+            
             for event in events:
                 
                 text, time = event
                 expiry_date = str(time).split(' ')[:-1][0]
 
-                embed = discord.Embed(title=f'🔔 **Reminder** 🔔 ', description=f'Activity: `{text.upper()}` \nDeadline: **{expiry_date}**', color=discord.Colour.dark_gold())
-                embed.set_image(url='https://cdn.dribbble.com/userupload/23917499/file/original-f0fec54e6c9d49c25c75e1b443f03b0b.gif')
-                await channel.send(embed=embed, delete_after=100)
-
-            await channel.send(f' @everyone, these are your activies for today!', delete_after=100)
-
+                embed = discord.Embed(title=f'🔔 **Reminder** 🔔 ', description='', color=discord.Colour.dark_gold())
+                embed.add_field(name='', value=f'> Activity: ** {text.capitalize()} ** \n> Deadline: ** {expiry_date} **', inline=False)
+                embed.set_thumbnail(url='https://media1.giphy.com/media/v1.Y2lkPTc5MGI3NjExN3N6ZG0zODFmemo5YzdndHd3dW16cWwxMTVkZmN6czE4dGFoczY1OSZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/PefhJNutC9LVrmDFjx/giphy.gif')
+               
+                await channel.send(embed=embed, delete_after=60)
+            
+            mention = discord.Embed(title=f"📌 @everyone", description="> These are the activities, check if you haven't done this activity yet." ,timestamp=datetime.now(self.ph_time), color=discord.Colour.dark_orange())
+            mention.set_image(url='https://cdn.dribbble.com/userupload/23917499/file/original-f0fec54e6c9d49c25c75e1b443f03b0b.gif')
+            await channel.send(embed=mention, delete_after=60)
+            await channel.send(f'@everyone❗', delete_after=60)
+        
     @tasks.loop(minutes=1)
-    async def check_expiration_date(self):
+    async def check_expiration_date(self): # loop for checking the expiration date
         query.check_date()
 
     @remind_schedule.before_loop

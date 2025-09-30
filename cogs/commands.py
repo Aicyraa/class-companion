@@ -4,9 +4,7 @@ from discord.ext import commands
 from utils.sql_func_helpers import Query
 from utils.sql_func_reminder import Reminder_Query
 
-
 # Config file
-
 
 class Commands(commands.Cog):
     def __init__(self, bot):
@@ -26,10 +24,10 @@ class Commands(commands.Cog):
             color=discord.Colour.og_blurple(),
         )
         embed.set_footer(text="Class Companion", icon_url=self.bot.user.avatar)
-        embed.add_field(name="", value="`schedule`", inline=True)
-        embed.add_field(name="", value="`viewSchedule`", inline=True)
-        embed.add_field(name="", value="`updateSchedule`", inline=True)
-        embed.add_field(name="", value="`setActivty`", inline=True)
+        embed.add_field(name="`schedule`", value='', inline=True)
+        embed.add_field(name="`viewSchedule`", value='', inline=True)
+        embed.add_field(name="`updateSchedule`", value='', inline=True)
+        embed.add_field(name="`activty`", value='', inline=True)
 
         await ctx.send(embed=embed)
 
@@ -98,7 +96,11 @@ class Commands(commands.Cog):
     @commands.command()
     @commands.has_permissions(administrator=True, manage_channels=True, manage_guild=True)
     async def activity(self, ctx, *message):  # for sever owner or admins
-
+        '''
+            May bug pag nag change ng bot, ung new bot wala permission
+            Nag eexecute ung loop kahit wala pang channel nag reresult ng error, need gumawa ng validation
+            
+        '''
         config = {
             "name": "《🔔》event-schedule",
             "permission": {
