@@ -44,7 +44,7 @@ class Reminder(commands.Cog):
                         print(f'Type, {type(schedule[0])},  {type(schedule[1])}, ==> {schedule} ')
                         embed.add_field(name=f'**`Schedule {counter}`** ⏰', value=f'> Time:   **{schedule[1][1:]}**\n> Schedule:   **{schedule[0]}** ' if schedule[1].startswith('0') else f'> Time:   **{schedule[1]}**\n> Schedule:   **{schedule[0]}** ', inline=False)
                         counter += 1
-                    counter = 0
+                    counter = 1
                 await user.send(embed=embed)
 
         if not int(hours) == 11:
