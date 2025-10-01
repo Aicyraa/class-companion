@@ -16,7 +16,7 @@ logging.basicConfig(
     ]
 )
 
-logger = logging.getLogger("discord")  
+logger = logging.getLogger("discord")   
 
 intents = discord.Intents.default()
 intents.message_content = True

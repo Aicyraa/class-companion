@@ -13,7 +13,7 @@ class Reminder(commands.Cog):
         self.bot = bot
         self.remind_schedule.add_exception_type(asyncpg.PostgresConnectionError)
         self.remind_schedule.start() # for starting the reminder
-        self.remind_activites.start() 
+        # self.remind_activites.start() 
         self.check_expiration_date.start() # for starting the func for checking the expiratin date
         self.stopper = False
 
@@ -29,26 +29,26 @@ class Reminder(commands.Cog):
         counter = 1        
         hours, minutes, today = datetime.now(self.ph_time).strftime("%I %M %A").split(' ') # for fetching the current time hours, minutes day
 
-        if int(hours) == 11 and int(minutes) < 60 and not self.stopper :
+        if int(hours) + 12 == 21 and int(minutes) < 60 and not self.stopper :
             self.stopper = True 
             result = query.schedule_remind()
             
             for user_id, event in result.items():
-            
+                
                 user = await self.bot.fetch_user(user_id)  # API call
                 embed = discord.Embed(title=f'📌 Hello, {user}❗', description=f"Here is your schedule for **`{today}`**  🗺️." if len(event) < 2 else f"Here is your schedules for **`{today}`**  🗺️.", colour=discord.Colour.brand_red())       
                 embed.set_image(url='http://bestanimations.com/HomeOffice/Clocks/Alarm/funny-alarm-clock-animated-gif-2.gif')
                 embed.set_footer(text='Class Companion', icon_url=self.bot.user.display_avatar.url)
                 
-                if event:
-                    for schedule in event:
-                        print(f'Type, {type(schedule[0])},  {type(schedule[1])}, ==> {schedule} ')
-                        embed.add_field(name=f'**`Schedule {counter}`** ⏰', value=f'> Time:   **{schedule[1][1:]}**\n> Schedule:   **{schedule[0]}** ' if schedule[1].startswith('0') else f'> Time:   **{schedule[1]}**\n> Schedule:   **{schedule[0]}** ', inline=False)
-                        counter += 1
-                    counter = 1
+                for schedule in event:
+                    print(f'Type, {type(schedule[0])},  {type(schedule[1])}, ==> {schedule} ')
+                    embed.add_field(name=f'**`Schedule {counter}`** ⏰', value=f'> Time:   **{schedule[1][1:]}**\n> Schedule:   **{schedule[0]}** ' if schedule[1].startswith('0') else f'> Time:   **{schedule[1]}**\n> Schedule:   **{schedule[0]}** ', inline=False)
+                    counter += 1
+                    
+                counter = 1
                 await user.send(embed=embed)
 
-        if not int(hours) == 11:
+        if not int(hours) + 12 == 21:
             self.stopper = False
 
     @tasks.loop(minutes=1)

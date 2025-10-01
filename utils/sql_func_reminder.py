@@ -32,7 +32,11 @@ class Reminder_Query:
                     AND schedules.event_day = %s; 
                     """, (user, today))
 
-                for details in list(cursor.fetchall()):
+                user_schedule = list(cursor.fetchall())  
+                if not user_schedule:
+                    continue
+                
+                for details in user_schedule:
                     schedules = list(details) # convert details into list
                     time = Reminder_Query.process_time(schedules.pop(-1))
 
