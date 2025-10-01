@@ -60,8 +60,6 @@ class Reminder(commands.Cog):
             channels = await guild.fetch_channels()
             channel = discord.utils.get(channels, name="《🔔》event-schedule")
             
-          
-            
             for event in events:
                 
                 text, time = event

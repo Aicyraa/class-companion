@@ -4,7 +4,6 @@ import re
 from utils.config import Settings
 from datetime import datetime, timedelta
 
-
 class Reminder_Query:
 
     ph_time = pytz.timezone('Asia/Manila')

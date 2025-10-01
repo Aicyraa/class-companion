@@ -6,7 +6,6 @@ from discord.ext import commands
 from utils.sql_func_checker import Checker
 from utils.config import Settings 
 
-
 logging.basicConfig(
     level=logging.INFO,  # Change to DEBUG if you want more details
     format="%(asctime)s | %(levelname)s | %(name)s | %(message)s",

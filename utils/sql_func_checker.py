@@ -2,7 +2,6 @@ import mysql.connector as sql
 from mysql.connector import errorcode
 from utils.config import Settings
 
-
 class Checker:
 
     @staticmethod
