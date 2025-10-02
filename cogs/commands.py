@@ -96,11 +96,7 @@ class Commands(commands.Cog):
     @commands.command()
     @commands.has_permissions(administrator=True, manage_channels=True, manage_guild=True)
     async def activity(self, ctx, *message):  # for sever owner or admins
-        '''
-            May bug pag nag change ng bot, ung new bot wala permission
-            Nag eexecute ung loop kahit wala pang channel nag reresult ng error, need gumawa ng validation
-            
-        '''
+       
         config = {
             "name": "《🔔》event-schedule",
             "permission": {
@@ -123,7 +119,6 @@ class Commands(commands.Cog):
             "id": None,
         }
 
-
         if not config["get"]:  # for creating the channel
             channel = await ctx.guild.create_text_channel(name=config["name"], overwrites=config["permission"])
             config["id"] = channel.id
@@ -143,7 +138,10 @@ class Commands(commands.Cog):
             await ctx.send(f"❌ Invalid duration format: `{duration}` (use 1D, 2H, 30M)", delete_after=10)
             return
 
+        
         Query.insert_activity(ctx.guild.id, event, expiry)
-
+        await ctx.send(f'@everyone, a new activity has been added!', delete_after=30)
+      
+            
 async def setup(bot):
     await bot.add_cog(Commands(bot))

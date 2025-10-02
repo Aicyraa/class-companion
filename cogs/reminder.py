@@ -13,7 +13,7 @@ class Reminder(commands.Cog):
         self.bot = bot
         self.remind_schedule.add_exception_type(asyncpg.PostgresConnectionError)
         self.remind_schedule.start() # for starting the reminder
-        # self.remind_activites.start() 
+        self.remind_activites.start() 
         self.check_expiration_date.start() # for starting the func for checking the expiratin date
         self.stopper = False
 
@@ -29,7 +29,7 @@ class Reminder(commands.Cog):
         counter = 1        
         hours, minutes, today = datetime.now(self.ph_time).strftime("%I %M %A").split(' ') # for fetching the current time hours, minutes day
 
-        if int(hours) + 12 == 21 and int(minutes) < 60 and not self.stopper :
+        if int(hours) == 0 and int(minutes) < 60 and not self.stopper :
             self.stopper = True 
             result = query.schedule_remind()
             
@@ -48,7 +48,7 @@ class Reminder(commands.Cog):
                 counter = 1
                 await user.send(embed=embed)
 
-        if not int(hours) + 12 == 21:
+        if not int(hours) == 0:
             self.stopper = False
 
     @tasks.loop(minutes=1)
