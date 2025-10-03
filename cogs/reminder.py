@@ -54,11 +54,16 @@ class Reminder(commands.Cog):
     @tasks.loop(minutes=1)
     async def remind_activites(self): # for reminding activities
         
+        ''' Nag error pag ung channel is hindi pa nacrecreate tas may activity na sa database'''
+        
         for guild_id, events in query.activity_remind().items():
             
             guild = await self.bot.fetch_guild(guild_id)
-            channels = await guild.fetch_channels()
-            channel = discord.utils.get(channels, name="《🔔》event-schedule")
+            fetch_channel = await guild.fetch_channels()
+            channel = discord.utils.get(fetch_channel, name="《🔔》event-schedule")
+            
+            if not channel: # if channel is hindi pa na ccreate, mag rereturn imbis na mag proceed ung remind para hindi mag error
+                return
             
             for event in events:
                 
