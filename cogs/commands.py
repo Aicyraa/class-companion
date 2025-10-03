@@ -25,10 +25,11 @@ class Commands(commands.Cog):
         )
         embed.set_footer(text="Class Companion", icon_url=self.bot.user.avatar)
         embed.add_field(name="`schedule`", value='', inline=True)
-        embed.add_field(name="`viewSchedule`", value='', inline=True)
-        embed.add_field(name="`updateSchedule`", value='', inline=True)
+        embed.add_field(name="`view`", value='', inline=True)
+        embed.add_field(name="`update`", value='', inline=True)
         embed.add_field(name="`activty`", value='', inline=True)
-
+        embed.add_field(name="`quiz`", value='', inline=True)
+        
         await ctx.send(embed=embed)
 
     @commands.command()
@@ -49,7 +50,7 @@ class Commands(commands.Cog):
                 color=discord.Colour.og_blurple(),
             )
             embed.set_thumbnail(url=self.bot.user.avatar)
-            embed.add_field(name="", value="`𖥔 Day`:  ( Monday - Saturday )", inline=False)
+            embed.add_field(name="", value="`𖥔 Day`:  ( Monday - Sunday )", inline=False)
             embed.add_field(name="", value=" `𖥔 Subject`:  Users Subject for that day", inline=False)
             embed.add_field(name="",value="`𖥔 Time`:  12-Hour AM/PM format e.g (1PM || 1AM)",inline=False,)
             await ctx.author.send(embed=embed)
@@ -116,12 +117,10 @@ class Commands(commands.Cog):
                 mention_everyone=True
             )},
             "get": discord.utils.get(ctx.guild.text_channels, name="《🔔》event-schedule"),
-            "id": None,
         }
 
         if not config["get"]:  # for creating the channel
             channel = await ctx.guild.create_text_channel(name=config["name"], overwrites=config["permission"])
-            config["id"] = channel.id
             await ctx.send(f'{config["name"]} is created!', delete_after=100)
             return
 
@@ -132,13 +131,11 @@ class Commands(commands.Cog):
         duration = message[-1]         # Example: "1H"
         event = " ".join(message[:-1]) # Example: "Math Homework"
 
-        # --- CONVERT TO EXPIRY ---
         expiry = Reminder_Query.convert_to_expiry(duration)
         if not expiry:
             await ctx.send(f"❌ Invalid duration format: `{duration}` (use 1D, 2H, 30M)", delete_after=10)
             return
 
-        
         Query.insert_activity(ctx.guild.id, event, expiry)
         await ctx.send(f'@everyone, a new activity has been added!', delete_after=30)
       
