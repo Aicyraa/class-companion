@@ -25,7 +25,7 @@ class Reminder(commands.Cog):
 
     @tasks.loop(minutes=1) # loops for sending and reminding students their schedule
     async def remind_schedule(self):
-
+        
         counter = 1        
         hours, minutes, today = datetime.now(self.ph_time).strftime("%I %M %A").split(' ') # for fetching the current time hours, minutes day
 
