@@ -24,11 +24,11 @@ class Commands(commands.Cog):
             color=discord.Colour.og_blurple(),
         )
         embed.set_footer(text="Class Companion", icon_url=self.bot.user.avatar)
-        embed.add_field(name="`schedule`", value='', inline=True)
-        embed.add_field(name="`view`", value='', inline=True)
-        embed.add_field(name="`update`", value='', inline=True)
-        embed.add_field(name="`activty`", value='', inline=True)
-        embed.add_field(name="`quiz`", value='', inline=True)
+        embed.add_field(name="`schedule`", value='> followed by schedule', inline=True)
+        embed.add_field(name="`view`", value='> to view current schedule', inline=True)
+        embed.add_field(name="`update`", value='> to update or delete schedule', inline=True)
+        embed.add_field(name="`activty`", value='> for creating a new activity reminder', inline=True)
+        embed.add_field(name="`quiz`", value='> for converting file to quiz', inline=True)
         
         await ctx.send(embed=embed)
 
