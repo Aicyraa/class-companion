@@ -1,6 +1,7 @@
 import mysql.connector as sql
 from datetime import datetime
 from utils.config import Settings
+from utils.sql_func_reminder import Reminder_Query as rq
 
 class Query:
 
@@ -36,15 +37,51 @@ class Query:
             cnx.close()
     
     @staticmethod
-    def fetch():
-        pass
+    def fetch(user):
+        
+        result = {}
+     
+        cnx = Settings.connection()
+        cursor = cnx.cursor()
+        
+        try:
+            cursor.execute(f'''USE {Settings.db}''')
+            for day in ('Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'): 
+                
+                cursor.execute('''SELECT event, event_time FROM schedules WHERE user_discord_id = %s and event_day = %s; ''', (user.author.id, day))  
+                qeury_result = cursor.fetchall()
+               
+                if not qeury_result:
+                    continue
+                
+                result[day] = []
+                
+                for sched in qeury_result:
+                    
+                    ''' Convert time delta into real time '''
+                                        
+                    schedule = f'{str(sched[0])}  {str(rq.process_time(sched[1])) }'
+                    result[day].append(schedule)
+                    
+            print(result)
+             
+        except sql.Error as err:
+            print(f'Error occur while viewing shedule {err}')
+        finally:
+            cursor.close()
+            cnx.close()
 
     @staticmethod
     def edit():
+        '''
+            kaya ma-edit ung time => Monday CompOrg 7pm (old), Monday, Comporg 10PM(new)
+            Ung Event and Time palang kaya maedit
+        '''
         pass
 
     @staticmethod
     def delete():
+        ''' Ung buong schedule details ung ilalagay para madelete '''
         pass
 
     @staticmethod

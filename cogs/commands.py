@@ -86,13 +86,14 @@ class Commands(commands.Cog):
 
         await ctx.author.send(embed=schedule_set)
 
-    @commands.command
-    async def viewSchedule(self):
-        ''' For viewing the schedules'''
-        pass
+    @commands.command()
+    async def view(self, ctx):
+        
+        schedule = Query.fetch(ctx)
+        
 
     @commands.command
-    async def updateSchedule(self):
+    async def update(self):
         ''' For updating the schedule'''
         pass
 
