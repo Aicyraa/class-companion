@@ -24,11 +24,11 @@ class Commands(commands.Cog):
             color=discord.Colour.og_blurple(),
         )
         embed.set_footer(text="Class Companion", icon_url=self.bot.user.avatar)
-        embed.add_field(name="`schedule`", value='> followed by schedule', inline=True)
-        embed.add_field(name="`view`", value='> to view current schedule', inline=True)
-        embed.add_field(name="`update`", value='> to update or delete schedule', inline=True)
-        embed.add_field(name="`activty`", value='> for creating a new activity reminder', inline=True)
-        embed.add_field(name="`quiz`", value='> for converting file to quiz', inline=True)
+        embed.add_field(name="`schedule`", value='> followed by schedule', inline=False)
+        embed.add_field(name="`view`", value='> to view current schedule', inline=False)
+        embed.add_field(name="`update`", value='> to update or delete schedule', inline=False)
+        embed.add_field(name="`activty`", value='> for creating a new activity reminder', inline=False)
+        embed.add_field(name="`quiz`", value='> for converting file to quiz', inline=False)
         
         await ctx.send(embed=embed)
 
@@ -88,10 +88,12 @@ class Commands(commands.Cog):
 
     @commands.command
     async def viewSchedule(self):
+        ''' For viewing the schedules'''
         pass
 
     @commands.command
     async def updateSchedule(self):
+        ''' For updating the schedule'''
         pass
 
     @commands.command()
@@ -120,7 +122,7 @@ class Commands(commands.Cog):
         }
 
         if not config["get"]:  # for creating the channel
-            channel = await ctx.guild.create_text_channel(name=config["name"], overwrites=config["permission"])
+            await ctx.guild.create_text_channel(name=config["name"], overwrites=config["permission"])
             await ctx.send(f'{config["name"]} is created!', delete_after=100)
             return
 
