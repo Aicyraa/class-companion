@@ -1,5 +1,6 @@
 import discord
 import re
+from datetime import datetime 
 from discord.ext import commands
 from utils.sql_func_helpers import Query
 from utils.sql_func_reminder import Reminder_Query
@@ -61,19 +62,7 @@ class Commands(commands.Cog):
         for i in range(0, len(args), 3):
             userSchedule = args[i : i + 3]
 
-            if (
-                userSchedule[0].lower()
-                not in (
-                    "monday",
-                    "tuesday",
-                    "wednesday",
-                    "thursday",
-                    "friday",
-                    "saturday",
-                    "sunday",
-                )
-                or len(userSchedule) < 3
-            ):
+            if userSchedule[0].lower() not in ("monday","tuesday","wednesday","thursday","friday","saturday", "sunday") or len(userSchedule) < 3:
                 await ctx.send(f"Invalid format! Check your format length or text! {len(userSchedule)} || {userSchedule[0]}",  delete_after=10)
                 continue
             elif not re.match( r"^(1[0-2]|0?[1-9])(AM|PM)$", userSchedule[2], re.IGNORECASE):
@@ -88,15 +77,30 @@ class Commands(commands.Cog):
 
     @commands.command()
     async def view(self, ctx):
-        
         schedule = Query.fetch(ctx)
         
-
-    @commands.command
-    async def update(self):
+        for day, events in schedule.items():
+            embed = discord.Embed(title=f'📌 **{day}** 📌', description=f'> {"\n > ".join(events)}', color=discord.Color.blurple())
+            await ctx.send(embed=embed)
+                 
+    @commands.command()
+    async def update(self, ctx):
         ''' For updating the schedule'''
         pass
-
+    
+    @commands.command()
+    async def delete(self, ctx, *args):
+        
+        result = Query.delete(ctx.author.id, args[0], args[1], datetime.strptime(args[2], "%I%p").time())
+        
+        if result:
+            embed = discord.Embed(title='✅ Successfuly deleted!', description=f'> {args[0]}-{args[1]}-{args[2]}', color=discord.Color.dark_red())
+            await ctx.send(embed=embed)
+            return 
+        
+        embed = discord.Embed(title='❌ Error while deleting!', description=f'Schedule does not match anything!',  color=discord.Color.dark_red()) # if hindi successful
+        await ctx.send(embed=embed)
+        
     @commands.command()
     @commands.has_permissions(administrator=True, manage_channels=True, manage_guild=True)
     async def activity(self, ctx, *message):  # for sever owner or admins
