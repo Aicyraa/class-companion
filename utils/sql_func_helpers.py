@@ -54,19 +54,12 @@ class Query:
                 if not qeury_result:
                     continue
                 
-                result[day] = []
-                
-                for sched in qeury_result:
-                    
-                    ''' Convert time delta into real time '''
-                                        
-                    schedule = f'{str(sched[0])}  {str(rq.process_time(sched[1])) }'
-                    result[day].append(schedule)
-                    
-            print(result)
+                schedule = [f'{str(sched[0])} {str(rq.process_time(sched[1]))}' for sched in qeury_result]
+                result[day] = schedule
+
+            return result
              
-        except sql.Error as err:
-            print(f'Error occur while viewing shedule {err}')
+        except sql.Error as err: print(f'Error occur while viewing shedule {err}')
         finally:
             cursor.close()
             cnx.close()
