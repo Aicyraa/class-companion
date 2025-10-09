@@ -45,12 +45,12 @@ class Query:
         cursor = cnx.cursor()
         
         try:
-            cursor.execute(f'''USE {Settings.db}''')
+            cursor.execute(f'USE {Settings.db}')
             for day in ('Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'): 
-                
+    
                 cursor.execute('''SELECT event, event_time FROM schedules WHERE user_discord_id = %s and event_day = %s; ''', (user.author.id, day))  
                 qeury_result = cursor.fetchall()
-               
+
                 if not qeury_result:
                     continue
                 
@@ -59,7 +59,7 @@ class Query:
 
             return result
              
-        except sql.Error as err: print(f'Error occur while viewing shedule {err}')
+        except sql.Error as err: print(f'Error occur while viewing shedule: {err}')
         finally:
             cursor.close()
             cnx.close()
@@ -73,10 +73,28 @@ class Query:
         pass
 
     @staticmethod
-    def delete():
-        ''' Ung buong schedule details ung ilalagay para madelete '''
-        pass
+    def delete(author, day, event, time):
+        
+        cnx = Settings.connection()
+        cursor = cnx.cursor()
+        
+        cursor.execute(f'''USE {Settings.db}''')
 
+        try:
+            
+            result = cursor.execute('SELECT  FROM schedules WHERE user_discord_id = %s AND event_day = %s AND event = %s AND event_time = %s; ''', (author, day, event, time))
+            print(result)
+            if cursor.fetchone():
+                cursor.execute('''DELETE FROM schedules WHERE user_discord_id = %s AND event_day = %s AND event = %s AND event_time = %s; ''', (author, day, event, time))
+                cnx.commit()
+                return True
+        
+        except sql.Error as err: print(f'Error occur deleting the schedule: {err}')
+        finally:
+            cursor.close()
+            cnx.close()
+            
+            
     @staticmethod
     def insert_activity(guild_id, event, expiry):
         
