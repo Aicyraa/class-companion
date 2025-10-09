@@ -7,7 +7,7 @@ from utils.sql_func_checker import Checker
 from utils.config import Settings 
 
 logging.basicConfig(
-    level=logging.INFO,  # Change to DEBUG if you want more details
+    level=logging.ERROR,  # Change to DEBUG if you want more details
     format="%(asctime)s | %(levelname)s | %(name)s | %(message)s",
     datefmt="%Y-%m-%d %H:%M:%S",
     handlers=[
