@@ -6,7 +6,7 @@ class Checker:
 
     @staticmethod
     async def check_db(db):
-
+        
         cnx = Settings.connection()
         cursor = cnx.cursor()
 

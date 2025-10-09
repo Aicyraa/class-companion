@@ -1,6 +1,7 @@
 import mysql.connector as sql
 from datetime import datetime
 from utils.config import Settings
+from utils.sql_func_reminder import Reminder_Query as rq
 
 class Query:
 
@@ -36,17 +37,64 @@ class Query:
             cnx.close()
     
     @staticmethod
-    def fetch():
-        pass
+    def fetch(user):
+        
+        result = {}
+     
+        cnx = Settings.connection()
+        cursor = cnx.cursor()
+        
+        try:
+            cursor.execute(f'USE {Settings.db}')
+            for day in ('Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'): 
+    
+                cursor.execute('''SELECT event, event_time FROM schedules WHERE user_discord_id = %s and event_day = %s; ''', (user.author.id, day))  
+                qeury_result = cursor.fetchall()
+
+                if not qeury_result:
+                    continue
+                
+                schedule = [f'{str(sched[0])} {str(rq.process_time(sched[1]))}' for sched in qeury_result]
+                result[day] = schedule
+
+            return result
+             
+        except sql.Error as err: print(f'Error occur while viewing shedule: {err}')
+        finally:
+            cursor.close()
+            cnx.close()
 
     @staticmethod
     def edit():
+        '''
+            kaya ma-edit ung time => Monday CompOrg 7pm (old), Monday, Comporg 10PM(new)
+            Ung Event and Time palang kaya maedit
+        '''
         pass
 
     @staticmethod
-    def delete():
-        pass
+    def delete(author, day, event, time):
+        
+        cnx = Settings.connection()
+        cursor = cnx.cursor()
+        
+        cursor.execute(f'''USE {Settings.db}''')
 
+        try:
+            
+            result = cursor.execute('SELECT  FROM schedules WHERE user_discord_id = %s AND event_day = %s AND event = %s AND event_time = %s; ''', (author, day, event, time))
+            print(result)
+            if cursor.fetchone():
+                cursor.execute('''DELETE FROM schedules WHERE user_discord_id = %s AND event_day = %s AND event = %s AND event_time = %s; ''', (author, day, event, time))
+                cnx.commit()
+                return True
+        
+        except sql.Error as err: print(f'Error occur deleting the schedule: {err}')
+        finally:
+            cursor.close()
+            cnx.close()
+            
+            
     @staticmethod
     def insert_activity(guild_id, event, expiry):
         
