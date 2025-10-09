@@ -13,13 +13,12 @@ class Reminder_Query:
 
         cnx = Settings.connection()
         cursor = cnx.cursor()
+        cursor.execute(f'USE {Settings.db}')
 
-        cursor.execute(f"USE {Settings.db}")
-        cursor.execute("SELECT user_discord_id FROM user")
-
-        today = datetime.now(Reminder_Query.ph_time).strftime("%A")
+        cursor.execute('SELECT user_discord_id FROM user')
         result = {}
-
+        today = datetime.now(Reminder_Query.ph_time).strftime("%A")
+        
         try:
             for (user,) in cursor.fetchall():
                 storage = []
@@ -33,6 +32,7 @@ class Reminder_Query:
                     """, (user, today))
 
                 user_schedule = list(cursor.fetchall())  
+                
                 if not user_schedule:
                     continue
                 
@@ -45,7 +45,7 @@ class Reminder_Query:
                     
                 result[user] = storage # added event to storage
 
-        except sql.Error as err: print(f'Error occur while fetching schedule {err}')
+        except sql.Error as err: print(f'Error occur while fetching schedule: {err}')
         finally:
             cursor.close()
             cnx.close()
@@ -59,7 +59,7 @@ class Reminder_Query:
         cursor = cnx.cursor()
         
         cursor.execute(f'USE {Settings.db}')
-        cursor.execute('''SELECT guild_id FROM guilds''')
+        cursor.execute('SELECT guild_id FROM guilds')
 
         result = {}   
 
@@ -78,7 +78,7 @@ class Reminder_Query:
 
                 result[guild_id] = storage # added event in result dict
             
-        except sql.Error as err: print(f'Error occur while fetching activities {err}')
+        except sql.Error as err: print(f'Error occur while fetching activities: {err}')
         finally:
             cursor.close()
             cnx.close()
@@ -100,7 +100,7 @@ class Reminder_Query:
             cnx.close()
 
     # for time convertion
-
+    
     @staticmethod
     def process_time(time: str) -> datetime: # func for converting time
         total_seconds = int(time.total_seconds())

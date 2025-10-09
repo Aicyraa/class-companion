@@ -12,7 +12,7 @@ class Query:
         cursor = cnx.cursor()
 
         uniqueID = ctx.author.id
-        day, event, tFormat = args # unpacked args
+        day, event, tFormat = args 
         time = datetime.strptime(tFormat, "%I%p").time() 
     
         try:
@@ -39,16 +39,16 @@ class Query:
     @staticmethod
     def fetch(user):
         
-        result = {}
-     
         cnx = Settings.connection()
         cursor = cnx.cursor()
+        
+        result = {}
         
         try:
             cursor.execute(f'USE {Settings.db}')
             for day in ('Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'): 
     
-                cursor.execute('''SELECT event, event_time FROM schedules WHERE user_discord_id = %s and event_day = %s; ''', (user.author.id, day))  
+                cursor.execute('SELECT event, event_time FROM schedules WHERE user_discord_id = %s and event_day = %s; ', (user.author.id, day))  
                 qeury_result = cursor.fetchall()
 
                 if not qeury_result:
@@ -81,9 +81,7 @@ class Query:
         cursor.execute(f'''USE {Settings.db}''')
 
         try:
-            
-            result = cursor.execute('SELECT  FROM schedules WHERE user_discord_id = %s AND event_day = %s AND event = %s AND event_time = %s; ''', (author, day, event, time))
-            print(result)
+            cursor.execute('SELECT  FROM schedules WHERE user_discord_id = %s AND event_day = %s AND event = %s AND event_time = %s; ''', (author, day, event, time))
             if cursor.fetchone():
                 cursor.execute('''DELETE FROM schedules WHERE user_discord_id = %s AND event_day = %s AND event = %s AND event_time = %s; ''', (author, day, event, time))
                 cnx.commit()
@@ -93,7 +91,6 @@ class Query:
         finally:
             cursor.close()
             cnx.close()
-            
             
     @staticmethod
     def insert_activity(guild_id, event, expiry):
@@ -112,7 +109,8 @@ class Query:
             cursor.execute(
                 """
                 INSERT INTO activities (guild_id, activity_details, expiry_date)
-                VALUES (%s, %s, %s) """, (guild_id, event, expiry.strftime("%Y-%m-%d %H:%M:%S")))
+                VALUES (%s, %s, %s) 
+                """, (guild_id, event, expiry.strftime("%Y-%m-%d %H:%M:%S")))
             
             cnx.commit()
 

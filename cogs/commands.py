@@ -19,37 +19,25 @@ class Commands(commands.Cog):
     @commands.command()
     async def showCmd(self, ctx):  # for sending a guide
 
-        embed = discord.Embed(
-            title="📍 Class Companion Commands",
-            description="""Use the `//` prefix before the command """,
-            color=discord.Colour.og_blurple(),
-        )
+        embed = discord.Embed(title="📍 Class Companion Commands", description="""Use the `//` prefix before the command """, color=discord.Colour.og_blurple(),)
         embed.set_footer(text="Class Companion", icon_url=self.bot.user.avatar)
         embed.add_field(name="`schedule`", value='> followed by schedule', inline=False)
         embed.add_field(name="`view`", value='> to view current schedule', inline=False)
-        embed.add_field(name="`update`", value='> to update or delete schedule', inline=False)
-        embed.add_field(name="`activty`", value='> for creating a new activity reminder', inline=False)
+        embed.add_field(name="`update`", value='> to update', inline=False)
+        embed.add_field(name="`delete`", value='> to delete', inline=False)
+        embed.add_field(name="`activity`", value='> for creating a new activity reminder', inline=False)
         embed.add_field(name="`quiz`", value='> for converting file to quiz', inline=False)
-        
         await ctx.send(embed=embed)
 
     @commands.command()
     async def schedule(self, ctx, *args):  # for schedule command
 
         if ctx.guild is not None:
-            embed = discord.Embed(
-                title=f"{ctx.author.display_name or ctx.author.name}",
-                description=f"A message has been sent to you!",
-                color=discord.Colour.og_blurple(),
-            )
+            embed = discord.Embed(title=f"{ctx.author.display_name or ctx.author.name}", description=f"A message has been sent to you!", color=discord.Colour.og_blurple(),)
             await ctx.send(embed=embed,  delete_after=1000)
 
         if not args or len(args) < 2:
-            embed = discord.Embed(
-                title="🗺️ Schedule Command Guide",
-                description="**⟣┄ˑ◌ The command `schedule` should be followed by the User Schedule in `DST` format. `NOTE`, you can add multiple schedule separated with space**",
-                color=discord.Colour.og_blurple(),
-            )
+            embed = discord.Embed(title="🗺️ Schedule Command Guide", description="**⟣┄ˑ◌ The command `schedule` should be followed by the User Schedule in `DST` format. `NOTE`, you can add multiple schedule separated with space**", color=discord.Colour.og_blurple())
             embed.set_thumbnail(url=self.bot.user.avatar)
             embed.add_field(name="", value="`𖥔 Day`:  ( Monday - Sunday )", inline=False)
             embed.add_field(name="", value=" `𖥔 Subject`:  Users Subject for that day", inline=False)
@@ -63,10 +51,10 @@ class Commands(commands.Cog):
             userSchedule = args[i : i + 3]
 
             if userSchedule[0].lower() not in ("monday","tuesday","wednesday","thursday","friday","saturday", "sunday") or len(userSchedule) < 3:
-                await ctx.send(f"Invalid format! Check your format length or text! {len(userSchedule)} || {userSchedule[0]}",  delete_after=10)
+                await ctx.send(f"❌ Invalid format! Check your format length or text! {len(userSchedule)} || {userSchedule[0]}",  delete_after=10)
                 continue
             elif not re.match( r"^(1[0-2]|0?[1-9])(AM|PM)$", userSchedule[2], re.IGNORECASE):
-                await ctx.send(f"Invalid time format: `{userSchedule[2]}`. Use like `1PM`, `11AM`.", delete_after=10)
+                await ctx.send(f"❌ Invalid time format: `{userSchedule[2]}`. Use like `1PM`, `11AM`.", delete_after=10)
                 continue
             else:
                 Query.insert_schedule(ctx, userSchedule)
@@ -77,6 +65,7 @@ class Commands(commands.Cog):
 
     @commands.command()
     async def view(self, ctx):
+        
         schedule = Query.fetch(ctx)
         
         for day, events in schedule.items():
@@ -126,26 +115,25 @@ class Commands(commands.Cog):
             "get": discord.utils.get(ctx.guild.text_channels, name="《🔔》event-schedule"),
         }
 
-        if not config["get"]:  # for creating the channel
+        if not config["get"]: 
             await ctx.guild.create_text_channel(name=config["name"], overwrites=config["permission"])
-            await ctx.send(f'{config["name"]} is created!', delete_after=100)
+            await ctx.send(f'📌 {config["name"]} is created!', delete_after=60)
             return
 
-        if len(message) < 2:  # Needs event + duration
-            await ctx.send('❌ Invalid parameters! Usage: `//activity "Event Name" 1H`', delete_after=10)
+        if len(message) < 2: 
+            await ctx.send('❌ Invalid parameters! Usage: `//activity "Event Name" 1H`', delete_after=60)
             return
     
-        duration = message[-1]         # Example: "1H"
-        event = " ".join(message[:-1]) # Example: "Math Homework"
+        duration = message[-1]         
+        event = " ".join(message[:-1]) 
 
         expiry = Reminder_Query.convert_to_expiry(duration)
         if not expiry:
-            await ctx.send(f"❌ Invalid duration format: `{duration}` (use 1D, 2H, 30M)", delete_after=10)
+            await ctx.send(f"❌ Invalid duration format: `{duration}` (use 1D, 2H, 30M)", delete_after=60)
             return
 
         Query.insert_activity(ctx.guild.id, event, expiry)
-        await ctx.send(f'@everyone, a new activity has been added!', delete_after=30)
-      
-            
+        await ctx.send(f'📌 @everyone, a new activity has been added!', delete_after=60)
+
 async def setup(bot):
     await bot.add_cog(Commands(bot))

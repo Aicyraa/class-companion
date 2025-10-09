@@ -28,7 +28,6 @@ async def load():
         if filename.endswith('.py'):
             await bot.load_extension(f'cogs.{filename[:-3]}')    
             
-
 async def main():
   
     await Checker.check_db( Settings.db) # for checking the database

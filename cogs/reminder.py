@@ -1,7 +1,7 @@
 import pytz
 import discord
 import asyncpg
-from datetime import datetime, time
+from datetime import datetime
 from discord.ext import tasks, commands
 from utils.sql_func_reminder import Reminder_Query as query
 
@@ -22,11 +22,10 @@ class Reminder(commands.Cog):
         self.remind_activites.cancel()
         self.check_expiration_date.cancel()
 
-
     @tasks.loop(minutes=1) # loops for sending and reminding students their schedule
     async def remind_schedule(self):
         
-        '''SHould remind 2 times a day'''
+        '''Should remind 2 times a day'''
         
         counter = 1        
         hours, minutes, today = datetime.now(self.ph_time).strftime("%I %M %A").split(' ') # for fetching the current time hours, minutes day
@@ -38,17 +37,16 @@ class Reminder(commands.Cog):
             for user_id, event in result.items():
                 
                 user = await self.bot.fetch_user(user_id)  # API call
-                embed = discord.Embed(title=f'📌 Hello, {user}❗', description=f"Here is your schedule for **`{today}`**  🗺️." if len(event) < 2 else f"Here is your schedules for **`{today}`**  🗺️.", colour=discord.Colour.brand_red())       
-                embed.set_image(url='http://bestanimations.com/HomeOffice/Clocks/Alarm/funny-alarm-clock-animated-gif-2.gif')
-                embed.set_footer(text='Class Companion', icon_url=self.bot.user.display_avatar.url)
+                remind_schedule = discord.Embed(title=f'📌 Hello, {user}❗', description=f"Here is your schedule for **`{today}`**  🗺️." if len(event) < 2 else f"Here is your schedules for **`{today}`**  🗺️.", colour=discord.Colour.brand_red())       
+                remind_schedule.set_image(url='http://bestanimations.com/HomeOffice/Clocks/Alarm/funny-alarm-clock-animated-gif-2.gif')
+                remind_schedule.set_footer(text='Class Companion', icon_url=self.bot.user.display_avatar.url)
                 
                 for schedule in event:
-                    print(f'Type, {type(schedule[0])},  {type(schedule[1])}, ==> {schedule} ')
-                    embed.add_field(name=f'**`Schedule {counter}`** ⏰', value=f'> Time:   **{schedule[1][1:]}**\n> Schedule:   **{schedule[0]}** ' if schedule[1].startswith('0') else f'> Time:   **{schedule[1]}**\n> Schedule:   **{schedule[0]}** ', inline=False)
+                    remind_schedule.add_field(name=f'**`Schedule {counter}`** ⏰', value=f'> Time:   **{schedule[1][1:]}**\n> Schedule:   **{schedule[0]}** ' if schedule[1].startswith('0') else f'> Time:   **{schedule[1]}**\n> Schedule:   **{schedule[0]}** ', inline=False)
                     counter += 1
                     
                 counter = 1
-                await user.send(embed=embed)
+                await user.send(embed=remind_schedule)
 
         if not int(hours) == 0:
             self.stopper = False
@@ -74,11 +72,11 @@ class Reminder(commands.Cog):
                 text, time = event
                 expiry_date = str(time).split(' ')[:-1][0]
 
-                embed = discord.Embed(title=f'🔔 **Reminder** 🔔 ', description='', color=discord.Colour.dark_gold())
-                embed.add_field(name='', value=f'> Activity: ** {text.capitalize()} ** \n> Deadline: ** {expiry_date} **', inline=False)
-                embed.set_thumbnail(url='https://media1.giphy.com/media/v1.Y2lkPTc5MGI3NjExN3N6ZG0zODFmemo5YzdndHd3dW16cWwxMTVkZmN6czE4dGFoczY1OSZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/PefhJNutC9LVrmDFjx/giphy.gif')
+                remind_activity = discord.Embed(title=f'🔔 **Reminder** 🔔 ', description='', color=discord.Colour.dark_gold())
+                remind_activity.add_field(name='', value=f'> Activity: ** {text.capitalize()} ** \n> Deadline: ** {expiry_date} **', inline=False)
+                remind_activity.set_thumbnail(url='https://media1.giphy.com/media/v1.Y2lkPTc5MGI3NjExN3N6ZG0zODFmemo5YzdndHd3dW16cWwxMTVkZmN6czE4dGFoczY1OSZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/PefhJNutC9LVrmDFjx/giphy.gif')
                
-                await channel.send(embed=embed, delete_after=60)
+                await channel.send(embed=remind_activity, delete_after=60)
             
             mention = discord.Embed(title=f"📌 @everyone", description="> These are the activities, check if you haven't done this activity yet." ,timestamp=datetime.now(self.ph_time), color=discord.Colour.dark_orange())
             mention.set_image(url='https://cdn.dribbble.com/userupload/23917499/file/original-f0fec54e6c9d49c25c75e1b443f03b0b.gif')

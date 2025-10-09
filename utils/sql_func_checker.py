@@ -11,15 +11,15 @@ class Checker:
         cursor = cnx.cursor()
 
         try:
-            cursor.execute(f"USE {db}")
+            cursor.execute(f'USE {db}')
+            
         except sql.Error as err:
             if err.errno == errorcode.ER_DB_ACCESS_DENIED:
                 print("Something is wrong with your DB!")
             elif err.errno == errorcode.ER_BAD_DB_ERROR:
                 print(f"{db} does not exist!")
                 Checker.create_db(cursor, db)
-            else:
-                print(f"Error ==> {err}")
+            else: print(f"Error ==> {err}")
 
     @staticmethod
     def create_db(cursor, db: str):
@@ -27,10 +27,8 @@ class Checker:
         try:
             cursor.execute(f"CREATE DATABASE {db}")
             print("DB created!")
-        except sql.Error as err:
-            print(f"An error occured while creating the database! ==> {err}")
-        finally:
-            cursor.close()
+        except sql.Error as err:print(f"An error occured while creating the database! ==> {err}")
+        finally: cursor.close()
 
     @staticmethod
     async def check_table():
@@ -82,7 +80,7 @@ class Checker:
                 event_time TIME NOT NULL,
                            
                 CONSTRAINT fk_parent FOREIGN KEY(user_discord_id) REFERENCES user(user_discord_id)
-            ); """ )
+                ); """ )
 
             # for activities
             cursor.execute(
@@ -94,7 +92,7 @@ class Checker:
                 expiry_date DATETIME NOT NULL,
                 
                 CONSTRAINT fk_parent_guild FOREIGN KEY(guild_id) REFERENCES guilds(guild_id)
-            ); """ )
+                ); """ )
 
             print("Table created!")
 
