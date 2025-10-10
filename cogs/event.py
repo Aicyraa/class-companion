@@ -8,7 +8,6 @@ class Event(commands.Cog):
     async def on_ready(self):
         print(f'{self.bot.user} is now online!')
         
-        
 async def setup(bot):
     await bot.add_cog(Event(bot))
     

@@ -6,28 +6,26 @@ from utils.sql_func_reminder import Reminder_Query as rq
 class Query:
 
     @staticmethod
-    def insert_schedule(ctx, args: tuple):
+    def insert_schedule(author: int, args: tuple):
 
         cnx = Settings.connection()
         cursor = cnx.cursor()
 
-        uniqueID = ctx.author.id
-        day, event, tFormat = args # unpacked args
-        time = datetime.strptime(tFormat, "%I%p").time() 
-    
+        day, event, time = args[:-1], rq.convert_to_24(args[-1])
+        print(time, '<== Time ')
         try:
             cursor.execute(f'USE {Settings.db}')
-            cursor.execute('SELECT * FROM user WHERE user_discord_id = %s', (uniqueID,))
+            cursor.execute('SELECT * FROM user WHERE user_discord_id = %s', (author,))
             
             if not cursor.fetchone():
-                cursor.execute('INSERT INTO user (user_discord_id) VALUES (%s)', (uniqueID, ))
+                cursor.execute('INSERT INTO user (user_discord_id) VALUES (%s)', (author, ))
                 cnx.commit()
 
             cursor.execute(
                     '''
                     INSERT INTO schedules (user_discord_id, event_day, event, event_time)
                     VALUES (%s, %s, %s, %s ); 
-                    ''', (uniqueID, day, event, time))
+                    ''', (author, day, event, time))
             
             cnx.commit()
 
@@ -37,24 +35,24 @@ class Query:
             cnx.close()
     
     @staticmethod
-    def fetch(user):
+    def fetch(author: int):
         
-        result = {}
-     
         cnx = Settings.connection()
         cursor = cnx.cursor()
+        
+        result = {}
         
         try:
             cursor.execute(f'USE {Settings.db}')
             for day in ('Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'): 
     
-                cursor.execute('''SELECT event, event_time FROM schedules WHERE user_discord_id = %s and event_day = %s; ''', (user.author.id, day))  
+                cursor.execute('SELECT event, event_time FROM schedules WHERE user_discord_id = %s and event_day = %s; ', (author, day))  
                 qeury_result = cursor.fetchall()
 
                 if not qeury_result:
                     continue
                 
-                schedule = [f'{str(sched[0])} {str(rq.process_time(sched[1]))}' for sched in qeury_result]
+                schedule = [f'{str(sched[0])} {str(rq.convert_to_12(sched[1]))}' for sched in qeury_result]
                 result[day] = schedule
 
             return result
@@ -65,25 +63,44 @@ class Query:
             cnx.close()
 
     @staticmethod
-    def edit():
-        '''
-            kaya ma-edit ung time => Monday CompOrg 7pm (old), Monday, Comporg 10PM(new)
-            Ung Event and Time palang kaya maedit
-        '''
-        pass
+    def edit(author: int, old, new):
+        
+        cnx =  Settings.connection()
+        cursor = cnx.cursor()
+        
+        cursor.execute(f'USE {Settings.db}')
+        print(f'{type(old)} : {old}')
+        print(f'{type(new)} : {new}')
+        print(f'{rq.convert_to_24(old[2])} , {rq.convert_to_24(new[2])}')
+        
+        try:
+            
+            cursor.execute(
+                '''
+                UPDATE schedules
+                SET event_day = %s, event = %s, event_time = %s
+                WHERE event_day = %s AND event = %s AND event_time = %s AND user_discord_id = %s; 
+                ''', (new[0], new[1], rq.convert_to_24(new[2]), old[0], old[1], rq.convert_to_24(old[2]), author))
+            
+            cnx.commit()
+            return True
+            
+        except sql.Error as err: print(f'Error occur while updating the schedule: {err}')
+        finally:
+            cursor.close()
+            cnx.close()
+        
 
     @staticmethod
-    def delete(author, day, event, time):
+    def delete(author: int, day, event, time):
         
         cnx = Settings.connection()
         cursor = cnx.cursor()
         
-        cursor.execute(f'''USE {Settings.db}''')
+        cursor.execute(f'USE {Settings.db}')
 
         try:
-            
-            result = cursor.execute('SELECT  FROM schedules WHERE user_discord_id = %s AND event_day = %s AND event = %s AND event_time = %s; ''', (author, day, event, time))
-            print(result)
+            cursor.execute('SELECT  FROM schedules WHERE user_discord_id = %s AND event_day = %s AND event = %s AND event_time = %s; ''', (author, day, event, time))
             if cursor.fetchone():
                 cursor.execute('''DELETE FROM schedules WHERE user_discord_id = %s AND event_day = %s AND event = %s AND event_time = %s; ''', (author, day, event, time))
                 cnx.commit()
@@ -94,9 +111,8 @@ class Query:
             cursor.close()
             cnx.close()
             
-            
     @staticmethod
-    def insert_activity(guild_id, event, expiry):
+    def insert_activity(guild_id: int, event, expiry):
         
         cnx = Settings.connection()
         cursor = cnx.cursor()
@@ -112,7 +128,8 @@ class Query:
             cursor.execute(
                 """
                 INSERT INTO activities (guild_id, activity_details, expiry_date)
-                VALUES (%s, %s, %s) """, (guild_id, event, expiry.strftime("%Y-%m-%d %H:%M:%S")))
+                VALUES (%s, %s, %s) 
+                """, (guild_id, event, expiry.strftime("%Y-%m-%d %H:%M:%S")))
             
             cnx.commit()
 

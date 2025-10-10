@@ -13,13 +13,12 @@ class Reminder_Query:
 
         cnx = Settings.connection()
         cursor = cnx.cursor()
+        cursor.execute(f'USE {Settings.db}')
 
-        cursor.execute(f"USE {Settings.db}")
-        cursor.execute("SELECT user_discord_id FROM user")
-
-        today = datetime.now(Reminder_Query.ph_time).strftime("%A")
+        cursor.execute('SELECT user_discord_id FROM user')
         result = {}
-
+        today = datetime.now(Reminder_Query.ph_time).strftime("%A")
+        
         try:
             for (user,) in cursor.fetchall():
                 storage = []
@@ -33,19 +32,20 @@ class Reminder_Query:
                     """, (user, today))
 
                 user_schedule = list(cursor.fetchall())  
+                
                 if not user_schedule:
                     continue
                 
                 for details in user_schedule:
                     schedules = list(details) # convert details into list
-                    time = Reminder_Query.process_time(schedules.pop(-1))
+                    time = Reminder_Query.convert_to_12(schedules.pop(-1))
 
                     schedules.append(time)
                     storage.append(schedules)
                     
                 result[user] = storage # added event to storage
 
-        except sql.Error as err: print(f'Error occur while fetching schedule {err}')
+        except sql.Error as err: print(f'Error occur while fetching schedule: {err}')
         finally:
             cursor.close()
             cnx.close()
@@ -59,7 +59,7 @@ class Reminder_Query:
         cursor = cnx.cursor()
         
         cursor.execute(f'USE {Settings.db}')
-        cursor.execute('''SELECT guild_id FROM guilds''')
+        cursor.execute('SELECT guild_id FROM guilds')
 
         result = {}   
 
@@ -78,7 +78,7 @@ class Reminder_Query:
 
                 result[guild_id] = storage # added event in result dict
             
-        except sql.Error as err: print(f'Error occur while fetching activities {err}')
+        except sql.Error as err: print(f'Error occur while fetching activities: {err}')
         finally:
             cursor.close()
             cnx.close()
@@ -100,22 +100,28 @@ class Reminder_Query:
             cnx.close()
 
     # for time convertion
-
+    
     @staticmethod
-    def process_time(time: str) -> datetime: # func for converting time
+    def convert_to_24(time: str) -> datetime: # for converting time into 24-hour format
+        print(time)
+        if ":" in time:
+            return datetime.strptime(time, "%I:%M%p").time()
+        else:
+            return datetime.strptime(time, "%I%p").time()
+    
+    
+    @staticmethod
+    def convert_to_12(time: str) -> datetime: # func for converting 24-hour time into 12 hours format
         total_seconds = int(time.total_seconds())
         hours_24, remainder = divmod(total_seconds, 3600)
         minutes, _ = divmod(remainder, 60)
         
         hours_12 = hours_24 % 12 or 12   # ensures always positive, converts correctly
         ampm = "AM" if hours_24 < 12 else "PM"
-        fixed_format = f"{hours_12:02d}:{minutes:02d} {ampm}"
-
-        return fixed_format
-
+        return f"{hours_12:02d}:{minutes:02d} {ampm}"
 
     @staticmethod
-    def convert_to_expiry(duration: str) -> datetime: # func for converting time
+    def convert_to_expiry(duration: str) -> datetime: # func for converting time into expiration date
         now = datetime.now()
         duration = duration.upper().strip()
         match = re.match(r"(\d+)([DHM])", duration)
