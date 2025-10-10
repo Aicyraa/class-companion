@@ -27,9 +27,9 @@ class Reminder(commands.Cog):
     async def remind_schedule(self):
         
         counter = 1        
-        _, __, today = datetime.now(self.ph_time).strftime("%I %M %A").split(' ') # for fetching the current time hours, minutes day
+        _, __, today = datetime.now(self.ph_time).strftime("%H %M %A").split(' ') # for fetching the current time hours, minutes day
         hours, minutes = int(_), int(__)
-        
+        print(hours)
         if hours in [0, 6, 12] and minutes == 0 and not self.schedule_stopper :
             self.stopper = True 
             result = query.schedule_remind()
@@ -54,7 +54,7 @@ class Reminder(commands.Cog):
     @tasks.loop(minutes=1)
     async def remind_activites(self): # for reminding activities
         
-        _, __, today = datetime.now(self.ph_time).strftime("%I %M %A").split(' ') # for fetching the current time hours, minutes day
+        _, __, today = datetime.now(self.ph_time).strftime("%H %M %A").split(' ') # for fetching the current time hours, minutes day
         hours, minutes = int(_), int(__)
         
         if hours in [0, 6, 12] and minutes == 0 and not self.remind_activites:
