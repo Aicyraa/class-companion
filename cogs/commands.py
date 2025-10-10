@@ -39,34 +39,33 @@ class Commands(commands.Cog):
         if not args or len(args) < 2:
             guide = discord.Embed(title="🗺️ Schedule Command Guide", description="**⟣┄ˑ◌ The command `schedule` should be followed by the User Schedule in `DST` format. `NOTE`, you can add multiple schedule separated with space**", color=discord.Colour.og_blurple())
             guide.set_thumbnail(url=self.bot.user.avatar)
-            guide.add_field(name="", value="`𖥔 Day`:  ( Monday - Sunday )", inline=False)
-            guide.add_field(name="", value=" `𖥔 Subject`:  Users Subject for that day", inline=False)
-            guide.add_field(name="",value="`𖥔 Time`:  12-Hour AM/PM format e.g (1PM || 1AM)",inline=False,)
+            guide.description += f"`\n\n𖥔 Day`:  ( Monday - Sunday )\n`𖥔 Subject`:  Users Subject for that day\n𖥔 Time`:  12-Hour AM/PM format e.g (1PM || 1:35PM)"
             await ctx.author.send(embed=guide)
             return
 
-        schedule_set = discord.Embed(title="⌛ Schedule is set!", color=discord.Colour.og_blurple())
+        schedule_set = discord.Embed(title="⌛ Schedule is set!", description='', color=discord.Colour.og_blurple())
 
         for i in range(0, len(args), 3):
+           
             userSchedule = args[i : i + 3]
 
             if userSchedule[0].lower() not in ("monday","tuesday","wednesday","thursday","friday","saturday", "sunday") or len(userSchedule) < 3:
                 await ctx.send(f"❌ Invalid format! Check your format length or text! {len(userSchedule)} || {userSchedule[0]}",  delete_after=10)
                 continue
-            elif not re.match(r"^(1[0-2]|0?[1-9])(AM|PM)$", userSchedule[2], re.IGNORECASE):
-                await ctx.send(f"❌ Invalid time format: `{userSchedule[2]}`. Use like `1PM`, `11AM`.", delete_after=10)
+            elif not re.match(r"^(0?[1-9]|1[0-2])(:[0-5][0-9])?(AM|PM)$", userSchedule[2].strip().upper()):
+                await ctx.send(f"❌ Invalid time format: `{userSchedule[2]}`. Use like `1PM`, `1:00PM`, or `11:30PM`.", delete_after=10)
                 continue
             else:
-                Query.insert_schedule(ctx, userSchedule)
+                Query.insert_schedule(ctx.author.id, userSchedule)
                 day, subj, time = userSchedule
-                schedule_set.add_field(name="", value=f"`𖥔 {day.upper()}`:  {subj},  {time}", inline=False)
+                schedule_set.description =( schedule_set.description or '')+ f'\n` 𖥔 {day.upper()}`:  {subj},  {time}'
 
         await ctx.author.send(embed=schedule_set)
 
     @commands.command()
     async def view(self, ctx):
         
-        schedule = Query.fetch(ctx)
+        schedule = Query.fetch(ctx.author.id)
         
         for day, events in schedule.items():
             embed = discord.Embed(title=f'📌 **{day}** 📌', description=f'> {"\n > ".join(events)}', color=discord.Color.blurple())
