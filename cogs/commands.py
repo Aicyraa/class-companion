@@ -33,16 +33,16 @@ class Commands(commands.Cog):
     async def schedule(self, ctx, *args):  # for schedule command
 
         if ctx.guild is not None:
-            embed = discord.Embed(title=f"{ctx.author.display_name or ctx.author.name}", description=f"A message has been sent to you!", color=discord.Colour.og_blurple(),)
-            await ctx.send(embed=embed,  delete_after=1000)
+            notify = discord.Embed(title=f"{ctx.author.display_name or ctx.author.name}", description=f"A message has been sent to you!", color=discord.Colour.og_blurple(),)
+            await ctx.send(embed=notify,  delete_after=1000)
 
         if not args or len(args) < 2:
-            embed = discord.Embed(title="🗺️ Schedule Command Guide", description="**⟣┄ˑ◌ The command `schedule` should be followed by the User Schedule in `DST` format. `NOTE`, you can add multiple schedule separated with space**", color=discord.Colour.og_blurple())
-            embed.set_thumbnail(url=self.bot.user.avatar)
-            embed.add_field(name="", value="`𖥔 Day`:  ( Monday - Sunday )", inline=False)
-            embed.add_field(name="", value=" `𖥔 Subject`:  Users Subject for that day", inline=False)
-            embed.add_field(name="",value="`𖥔 Time`:  12-Hour AM/PM format e.g (1PM || 1AM)",inline=False,)
-            await ctx.author.send(embed=embed)
+            guide = discord.Embed(title="🗺️ Schedule Command Guide", description="**⟣┄ˑ◌ The command `schedule` should be followed by the User Schedule in `DST` format. `NOTE`, you can add multiple schedule separated with space**", color=discord.Colour.og_blurple())
+            guide.set_thumbnail(url=self.bot.user.avatar)
+            guide.add_field(name="", value="`𖥔 Day`:  ( Monday - Sunday )", inline=False)
+            guide.add_field(name="", value=" `𖥔 Subject`:  Users Subject for that day", inline=False)
+            guide.add_field(name="",value="`𖥔 Time`:  12-Hour AM/PM format e.g (1PM || 1AM)",inline=False,)
+            await ctx.author.send(embed=guide)
             return
 
         schedule_set = discord.Embed(title="⌛ Schedule is set!", color=discord.Colour.og_blurple())
@@ -53,7 +53,7 @@ class Commands(commands.Cog):
             if userSchedule[0].lower() not in ("monday","tuesday","wednesday","thursday","friday","saturday", "sunday") or len(userSchedule) < 3:
                 await ctx.send(f"❌ Invalid format! Check your format length or text! {len(userSchedule)} || {userSchedule[0]}",  delete_after=10)
                 continue
-            elif not re.match( r"^(1[0-2]|0?[1-9])(AM|PM)$", userSchedule[2], re.IGNORECASE):
+            elif not re.match(r"^(1[0-2]|0?[1-9])(AM|PM)$", userSchedule[2], re.IGNORECASE):
                 await ctx.send(f"❌ Invalid time format: `{userSchedule[2]}`. Use like `1PM`, `11AM`.", delete_after=10)
                 continue
             else:
@@ -79,6 +79,13 @@ class Commands(commands.Cog):
     
     @commands.command()
     async def delete(self, ctx, *args):
+        
+        if not args or len(args) < 2:
+            guide = discord.Embed(title="🗺️ Delete Command Guide", description="**⟣┄ˑ◌ The command `delete` should be followed by the User Schedule in `DET` format.**", color=discord.Colour.og_blurple())
+            guide.set_thumbnail(url=self.bot.user.avatar)
+            guide.add_field(name="`𖥔 Day Event Time`", value="", inline=False)
+            await ctx.author.send(embed=guide)
+            return
         
         result = Query.delete(ctx.author.id, args[0], args[1], datetime.strptime(args[2], "%I%p").time())
         
