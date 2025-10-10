@@ -26,8 +26,6 @@ class Reminder(commands.Cog):
     @tasks.loop(minutes=1) # loops for sending and reminding students their schedule
     async def remind_schedule(self):
         
-        '''Should remind 2 times a day'''
-        
         counter = 1        
         _, __, today = datetime.now(self.ph_time).strftime("%I %M %A").split(' ') # for fetching the current time hours, minutes day
         hours, minutes = int(_), int(__)
@@ -55,8 +53,6 @@ class Reminder(commands.Cog):
 
     @tasks.loop(minutes=1)
     async def remind_activites(self): # for reminding activities
-        
-        ''' Nag error pag ung channel is hindi pa nacrecreate tas may activity na sa database'''
         
         _, __, today = datetime.now(self.ph_time).strftime("%I %M %A").split(' ') # for fetching the current time hours, minutes day
         hours, minutes = int(_), int(__)
