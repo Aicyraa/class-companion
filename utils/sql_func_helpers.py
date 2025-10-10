@@ -66,10 +66,13 @@ class Query:
 
     @staticmethod
     def edit():
-        '''
-            kaya ma-edit ung time => Monday CompOrg 7pm (old), Monday, Comporg 10PM(new)
-            Ung Event and Time palang kaya maedit
-        '''
+        
+        cnx =  Settings.connection()
+        cursor = cnx.cursor()
+        
+        cursor.execute(f'')
+        
+        
         pass
 
     @staticmethod
@@ -78,7 +81,7 @@ class Query:
         cnx = Settings.connection()
         cursor = cnx.cursor()
         
-        cursor.execute(f'''USE {Settings.db}''')
+        cursor.execute(f'USE {Settings.db}')
 
         try:
             cursor.execute('SELECT  FROM schedules WHERE user_discord_id = %s AND event_day = %s AND event = %s AND event_time = %s; ''', (author, day, event, time))
