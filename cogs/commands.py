@@ -58,7 +58,7 @@ class Commands(commands.Cog):
             else:
                 Query.insert_schedule(ctx.author.id, userSchedule)
                 day, subj, time = userSchedule
-                schedule_set.description =( schedule_set.description or '')+ f'\n` 𖥔 {day.upper()}`:  {subj},  {time}'
+                schedule_set.description = (schedule_set.description or '')+ f'\n` 𖥔 {day.upper()}`:  {subj},  {time}'
 
         await ctx.author.send(embed=schedule_set)
 
@@ -69,32 +69,54 @@ class Commands(commands.Cog):
         
         for day, events in schedule.items():
             embed = discord.Embed(title=f'📌 **{day}** 📌', description=f'> {"\n > ".join(events)}', color=discord.Color.blurple())
-            await ctx.send(embed=embed)
+            await ctx.send(embed=embed, delete_after=1200)
                  
     @commands.command()
-    async def update(self, ctx):
-        ''' For updating the schedule'''
-        pass
-    
+    async def update(self, ctx, *args):
+            
+        if not args or len(args) < 2:
+            guide = discord.Embed(title="🗺️ Update Command Guide", description="**⟣┄ˑ◌ The command `update` should be followed by the User Schedule in `(OLD) DET - DET (NEW)` format.**\n\n`𖥔 Day Event Time`", color=discord.Colour.og_blurple())
+            guide.set_thumbnail(url=self.bot.user.avatar)
+            guide.set_footer(text="Class Companion", icon_url=self.bot.user.avatar)
+            await ctx.author.send(embed=guide, delete_after=600)
+            return
+        
+        if '-' not in args or len(args) > 7:
+            return 
+            
+        old, new = (" ".join(args)).split(' - ')
+        result = Query.edit(ctx.author.id, old.split(' '), new.split(' '))
+        
+        print(args)
+        
+        if result:
+            notify = discord.Embed(title='✅ Successfuly Updated!', description=f'> {args[0]}-{args[1]}-{args[2]}', color=discord.Color.dark_red())
+            notify.set_footer(text="Class Companion", icon_url=self.bot.user.avatar)
+            await ctx.send(embed=notify, delete_after=600)
+            return     
+        
+        notify = discord.Embed(title='❌ Error while updating!', description=f'Schedule does not match anything!',  color=discord.Color.dark_red()) # if hindi successful
+        notify.set_footer(text="Class Companion", icon_url=self.bot.user.avatar)
+        await ctx.send(embed=notify, delete_after=600)
+               
     @commands.command()
     async def delete(self, ctx, *args):
         
         if not args or len(args) < 2:
-            guide = discord.Embed(title="🗺️ Delete Command Guide", description="**⟣┄ˑ◌ The command `delete` should be followed by the User Schedule in `DET` format.**", color=discord.Colour.og_blurple())
+            guide = discord.Embed(title="🗺️ Delete Command Guide", description="**⟣┄ˑ◌ The command `delete` should be followed by the User Schedule in `DET` format.**\n\n`𖥔 Day Event Time`", color=discord.Colour.og_blurple())
             guide.set_thumbnail(url=self.bot.user.avatar)
-            guide.add_field(name="`𖥔 Day Event Time`", value="", inline=False)
-            await ctx.author.send(embed=guide)
+            await ctx.author.send(embed=guide, delete_after=600)
             return
         
         result = Query.delete(ctx.author.id, args[0], args[1], datetime.strptime(args[2], "%I%p").time())
         
         if result:
-            embed = discord.Embed(title='✅ Successfuly deleted!', description=f'> {args[0]}-{args[1]}-{args[2]}', color=discord.Color.dark_red())
-            await ctx.send(embed=embed)
+            notify = discord.Embed(title='✅ Successfuly deleted!', description=f'> {args[0]}-{args[1]}-{args[2]}', color=discord.Color.dark_red())
+            await ctx.send(embed=notify, delete_after=600)
             return 
         
-        embed = discord.Embed(title='❌ Error while deleting!', description=f'Schedule does not match anything!',  color=discord.Color.dark_red()) # if hindi successful
-        await ctx.send(embed=embed)
+        notify = discord.Embed(title='❌ Error while deleting!', description=f'Schedule does not match anything!',  color=discord.Color.dark_red()) # if hindi successful
+        await ctx.send(embed=notify, delete_after=600)
         
     @commands.command()
     @commands.has_permissions(administrator=True, manage_channels=True, manage_guild=True)
