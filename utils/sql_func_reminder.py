@@ -38,7 +38,7 @@ class Reminder_Query:
                 
                 for details in user_schedule:
                     schedules = list(details) # convert details into list
-                    time = Reminder_Query.process_time(schedules.pop(-1))
+                    time = Reminder_Query.convert_to_12(schedules.pop(-1))
 
                     schedules.append(time)
                     storage.append(schedules)
@@ -102,20 +102,26 @@ class Reminder_Query:
     # for time convertion
     
     @staticmethod
-    def process_time(time: str) -> datetime: # func for converting time
+    def convert_to_24(time: str) -> datetime: # for converting time into 24-hour format
+        print(time)
+        if ":" in time:
+            return datetime.strptime(time, "%I:%M%p").time()
+        else:
+            return datetime.strptime(time, "%I%p").time()
+    
+    
+    @staticmethod
+    def convert_to_12(time: str) -> datetime: # func for converting 24-hour time into 12 hours format
         total_seconds = int(time.total_seconds())
         hours_24, remainder = divmod(total_seconds, 3600)
         minutes, _ = divmod(remainder, 60)
         
         hours_12 = hours_24 % 12 or 12   # ensures always positive, converts correctly
         ampm = "AM" if hours_24 < 12 else "PM"
-        fixed_format = f"{hours_12:02d}:{minutes:02d} {ampm}"
-
-        return fixed_format
-
+        return f"{hours_12:02d}:{minutes:02d} {ampm}"
 
     @staticmethod
-    def convert_to_expiry(duration: str) -> datetime: # func for converting time
+    def convert_to_expiry(duration: str) -> datetime: # func for converting time into expiration date
         now = datetime.now()
         duration = duration.upper().strip()
         match = re.match(r"(\d+)([DHM])", duration)
