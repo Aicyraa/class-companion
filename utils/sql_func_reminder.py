@@ -92,8 +92,10 @@ class Reminder_Query:
         cursor = cnx.cursor()
 
         cursor.execute(f'''USE {Settings.db}''')
-
-        try: cursor.execute('''DELETE FROM activities WHERE expiry_date <= NOW(); ''')
+        print('Check')
+        try: 
+            cursor.execute('''DELETE FROM activities WHERE expiry_date <= NOW(); ''')
+            cnx.commit()
         except sql.Error as err: print(f'Error occur while deleting {err}')
         finally:
             cursor.close()
