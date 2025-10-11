@@ -29,7 +29,7 @@ async def load():
             await bot.load_extension(f'cogs.{filename[:-3]}')    
             
 async def main():
-  
+    
     await Checker.check_db( Settings.db) # for checking the database
     await Checker.check_table() # for checking the table
     await load() # loading cogs
