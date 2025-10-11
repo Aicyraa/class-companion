@@ -11,8 +11,9 @@ class Query:
         cnx = Settings.connection()
         cursor = cnx.cursor()
 
-        day, event, time = args[:-1], rq.convert_to_24(args[-1])
-        print(time, '<== Time ')
+        day, event, Tformat = args
+        time = rq.convert_to_24(Tformat)
+      
         try:
             cursor.execute(f'USE {Settings.db}')
             cursor.execute('SELECT * FROM user WHERE user_discord_id = %s', (author,))
@@ -68,13 +69,8 @@ class Query:
         cnx =  Settings.connection()
         cursor = cnx.cursor()
         
-        cursor.execute(f'USE {Settings.db}')
-        print(f'{type(old)} : {old}')
-        print(f'{type(new)} : {new}')
-        print(f'{rq.convert_to_24(old[2])} , {rq.convert_to_24(new[2])}')
-        
         try:
-            
+            cursor.execute(f'USE {Settings.db}')
             cursor.execute(
                 '''
                 UPDATE schedules
@@ -97,9 +93,8 @@ class Query:
         cnx = Settings.connection()
         cursor = cnx.cursor()
         
-        cursor.execute(f'USE {Settings.db}')
-
         try:
+            cursor.execute(f'USE {Settings.db}')
             cursor.execute('SELECT  FROM schedules WHERE user_discord_id = %s AND event_day = %s AND event = %s AND event_time = %s; ''', (author, day, event, time))
             if cursor.fetchone():
                 cursor.execute('''DELETE FROM schedules WHERE user_discord_id = %s AND event_day = %s AND event = %s AND event_time = %s; ''', (author, day, event, time))
@@ -117,9 +112,8 @@ class Query:
         cnx = Settings.connection()
         cursor = cnx.cursor()
         
-        cursor.execute(f'USE {Settings.db}')
-
         try:
+            cursor.execute(f'USE {Settings.db}')
             cursor.execute('''SELECT * FROM guilds WHERE guild_id = %s''', (guild_id, ))
             if not cursor.fetchone():
                 cursor.execute('''INSERT INTO guilds (guild_id) VALUES (%s)''', (guild_id, ))
