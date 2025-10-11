@@ -2,6 +2,7 @@ import mysql.connector as sql
 from datetime import datetime
 from utils.config import Settings
 from utils.sql_func_reminder import Reminder_Query as rq
+from utils.time_converter import Time_Converter as tc
 
 class Query:
 
@@ -11,8 +12,9 @@ class Query:
         cnx = Settings.connection()
         cursor = cnx.cursor()
 
-        day, event, time = args[:-1], rq.convert_to_24(args[-1])
-        print(time, '<== Time ')
+        day, event, Tformat = args
+        time = tc.convert_to_24(Tformat)
+      
         try:
             cursor.execute(f'USE {Settings.db}')
             cursor.execute('SELECT * FROM user WHERE user_discord_id = %s', (author,))
@@ -52,7 +54,7 @@ class Query:
                 if not qeury_result:
                     continue
                 
-                schedule = [f'{str(sched[0])} {str(rq.convert_to_12(sched[1]))}' for sched in qeury_result]
+                schedule = [f'{str(sched[0])} - {str(tc.convert_to_12(sched[1]))}' for sched in qeury_result]
                 result[day] = schedule
 
             return result
@@ -68,19 +70,14 @@ class Query:
         cnx =  Settings.connection()
         cursor = cnx.cursor()
         
-        cursor.execute(f'USE {Settings.db}')
-        print(f'{type(old)} : {old}')
-        print(f'{type(new)} : {new}')
-        print(f'{rq.convert_to_24(old[2])} , {rq.convert_to_24(new[2])}')
-        
         try:
-            
+            cursor.execute(f'USE {Settings.db}')
             cursor.execute(
                 '''
                 UPDATE schedules
                 SET event_day = %s, event = %s, event_time = %s
                 WHERE event_day = %s AND event = %s AND event_time = %s AND user_discord_id = %s; 
-                ''', (new[0], new[1], rq.convert_to_24(new[2]), old[0], old[1], rq.convert_to_24(old[2]), author))
+                ''', (new[0], new[1], tc.convert_to_24(new[2]), old[0], old[1], tc.convert_to_24(old[2]), author))
             
             cnx.commit()
             return True
@@ -97,14 +94,14 @@ class Query:
         cnx = Settings.connection()
         cursor = cnx.cursor()
         
-        cursor.execute(f'USE {Settings.db}')
-
         try:
-            cursor.execute('SELECT  FROM schedules WHERE user_discord_id = %s AND event_day = %s AND event = %s AND event_time = %s; ''', (author, day, event, time))
+            cursor.execute(f'USE {Settings.db}')
+            cursor.execute('SELECT * FROM schedules WHERE user_discord_id = %s AND event_day = %s AND event = %s AND event_time = %s; ''', (author, day, event, time))
             if cursor.fetchone():
                 cursor.execute('''DELETE FROM schedules WHERE user_discord_id = %s AND event_day = %s AND event = %s AND event_time = %s; ''', (author, day, event, time))
                 cnx.commit()
                 return True
+            
         
         except sql.Error as err: print(f'Error occur deleting the schedule: {err}')
         finally:
@@ -117,9 +114,8 @@ class Query:
         cnx = Settings.connection()
         cursor = cnx.cursor()
         
-        cursor.execute(f'USE {Settings.db}')
-
         try:
+            cursor.execute(f'USE {Settings.db}')
             cursor.execute('''SELECT * FROM guilds WHERE guild_id = %s''', (guild_id, ))
             if not cursor.fetchone():
                 cursor.execute('''INSERT INTO guilds (guild_id) VALUES (%s)''', (guild_id, ))
