@@ -2,6 +2,7 @@ import mysql.connector as sql
 from datetime import datetime
 from utils.config import Settings
 from utils.sql_func_reminder import Reminder_Query as rq
+from utils.time_converter import Time_Converter as tc
 
 class Query:
 
@@ -12,7 +13,7 @@ class Query:
         cursor = cnx.cursor()
 
         day, event, Tformat = args
-        time = rq.convert_to_24(Tformat)
+        time = tc.convert_to_24(Tformat)
       
         try:
             cursor.execute(f'USE {Settings.db}')
@@ -53,7 +54,7 @@ class Query:
                 if not qeury_result:
                     continue
                 
-                schedule = [f'{str(sched[0])} - {str(rq.convert_to_12(sched[1]))}' for sched in qeury_result]
+                schedule = [f'{str(sched[0])} - {str(tc.convert_to_12(sched[1]))}' for sched in qeury_result]
                 result[day] = schedule
 
             return result
@@ -76,7 +77,7 @@ class Query:
                 UPDATE schedules
                 SET event_day = %s, event = %s, event_time = %s
                 WHERE event_day = %s AND event = %s AND event_time = %s AND user_discord_id = %s; 
-                ''', (new[0], new[1], rq.convert_to_24(new[2]), old[0], old[1], rq.convert_to_24(old[2]), author))
+                ''', (new[0], new[1], tc.convert_to_24(new[2]), old[0], old[1], tc.convert_to_24(old[2]), author))
             
             cnx.commit()
             return True
