@@ -26,7 +26,7 @@ class Commands(commands.Cog):
         guide.add_field(name="`view`", value='> to view current schedule', inline=False)
         guide.add_field(name="`update`", value='> to update\n> **//update (old) Day Event Time - (new) Day Event Time**', inline=False)
         guide.add_field(name="`delete`", value='> to delete\n> **//delete Day Event Time**', inline=False)
-        guide.add_field(name="`activity`", value='> for creating a new activity reminder\n> **/activity event:Text duration: 1D | 1H | 10M | 1D1H10M)**', inline=False)
+        guide.add_field(name="`activity`", value='> for creating a new activity reminder\n> **/activity event:Text    duration: 1D | 1H | 10M | 1D1H10M**', inline=False)
         guide.add_field(name="`quiz`", value='> for converting file to quiz', inline=False)
         await interaction.response.send_message(embed=guide)
 
@@ -47,21 +47,20 @@ class Commands(commands.Cog):
         schedule_set = discord.Embed(title="⌛ Schedule is set!", description='', color=discord.Colour.og_blurple())
         schedule_set.set_footer(text="Class Companion", icon_url=self.bot.user.avatar)
         
-        
         for i in range(0, len(args), 3):
            
             userSchedule = args[i : i + 3]
 
-            if userSchedule[0].lower() not in ("monday","tuesday","wednesday","thursday","friday","saturday", "sunday") or len(userSchedule) < 3:
-                await ctx.send(f"❌ Invalid format! Check your format length or text! {len(userSchedule)} || {userSchedule[0]}",  delete_after=10)
+            if userSchedule[0].lower() not in ("monday", "tuesday", "wednesday","thursday", "friday", "saturday", "sunday") or len(userSchedule) < 3:
+                await ctx.author.send(f"❌ Invalid format! Check your text format or text length! {len(userSchedule)} || {userSchedule[0]}",  delete_after=10)
                 continue
             elif not re.match(r"^(0?[1-9]|1[0-2])(:[0-5][0-9])?(AM|PM)$", userSchedule[2].strip().upper()):
-                await ctx.send(f"❌ Invalid time format: `{userSchedule[2]}`. Use like `1PM`, `1:00PM`, or `11:30PM`.", delete_after=10)
+                await ctx.author.send(f"❌ Invalid time format: `{userSchedule[2]}`. Use like `1PM`, `1:00PM`, or `11:30PM`.", delete_after=10)
                 continue
             else:
                 Query.insert_schedule(ctx.author.id, userSchedule)
                 day, subj, time = userSchedule
-                schedule_set.description = (schedule_set.description or '')+ f'\n` 𖥔 {day.upper()}`:  {subj},  {time}'
+                schedule_set.description = (schedule_set.description or '')+ f'\n` 𖥔 {day.upper()}`:  {subj},  {time}\n'
 
         await ctx.author.send(embed=schedule_set)
 
@@ -71,7 +70,7 @@ class Commands(commands.Cog):
         schedule = Query.fetch(ctx.author.id)
         
         for day, events in schedule.items():
-            view = discord.Embed(title=f'📌 **{day}** 📌', description=f'> **{"\n > ".join(events)}**', color=discord.Color.dark_gold())
+            view = discord.Embed(title=f' ⟣┄─⟣┄─ ** {day} ** ┄─⟣┄─⟣  ', description=f'> **{"\n > ".join(events)}**', color=discord.Color.dark_gold())
             view.set_footer(text="Class Companion", icon_url=self.bot.user.avatar)
             await ctx.send(embed=view, delete_after=1200)
                  
@@ -86,7 +85,7 @@ class Commands(commands.Cog):
             return
         
         if '-' not in args or len(args) > 7:
-            error = discord.Embed(title='❌ Error', description='Invalid format!', color=discord.Color.dark_gold())
+            error = discord.Embed(title='⟣┄─ ૮ Error: Invalid format! ❌ ', description='', color=discord.Color.dark_gold())
             await ctx.send(embed=error)
             return 
             
@@ -94,12 +93,12 @@ class Commands(commands.Cog):
         result = Query.edit(ctx.author.id, old.split(' '), new.split(' '))
         
         if result:
-            notify = discord.Embed(title='✅ ⟣┄ˑ◌ Successfuly Updated!', description=f'> {args[0]} {args[1]} {args[2]} to {args[4]} {args[5]} {args[6]}', color=discord.Color.dark_green())
+            notify = discord.Embed(title='⟣┄─ ૮ Successfully Updated! ✅', description=f'> {args[0]} {args[1]} {args[2]} to {args[4]} {args[5]} {args[6]}', color=discord.Color.dark_green())
             notify.set_footer(text="Class Companion", icon_url=self.bot.user.avatar)
             await ctx.send(embed=notify, delete_after=600)
             return     
         
-        error = discord.Embed(title='❌ Error while updating!', description=f'Schedule does not match anything!',  color=discord.Color.dark_red()) # if hindi successful
+        error = discord.Embed(title='⟣┄─ ૮ Error while updating! ❌', description=f'Schedule does not match anything!',  color=discord.Color.dark_red()) # if hindi successful
         error.set_footer(text="Class Companion", icon_url=self.bot.user.avatar)
         await ctx.send(embed=error, delete_after=600)
                
@@ -115,12 +114,12 @@ class Commands(commands.Cog):
         result = Query.delete(ctx.author.id, args[0], args[1], tc.convert_to_24(args[2]) )
         
         if result:
-            success = discord.Embed(title='✅ Successfuly deleted!', description=f'> {args[0]} - {args[1]} - {args[2]}', color=discord.Color.dark_green())
+            success = discord.Embed(title='⟣┄─ ૮ Successfully deleted! ✅', description=f'> {args[0]} - {args[1]} - {args[2]}', color=discord.Color.dark_green())
             success.set_footer(text="Class Companion", icon_url=self.bot.user.avatar)   
             await ctx.send(embed=success, delete_after=600)
             return 
         
-        error = discord.Embed(title='❌ Error while deleting!', description=f'Schedule does not match anything!',  color=discord.Color.dark_red()) # if hindi successful
+        error = discord.Embed(title='⟣┄─ ૮ Error while deleting! ❌', description=f'Schedule does not match anything!',  color=discord.Color.dark_red()) # if hindi successful
         error.set_footer(text="Class Companion", icon_url=self.bot.user.avatar)
         await ctx.send(embed=error, delete_after=600)
         
@@ -153,20 +152,20 @@ class Commands(commands.Cog):
                     mention_everyone=True
                 )
             }
-            await guild.create_text_channel(name=config["name"], overwrites=overwrites)
+            config['get'] = await guild.create_text_channel(name=config["name"], overwrites=overwrites)
             await interaction.response.send_message(f'📌 {config["name"]} channel created!', ephemeral=True)
-            return
+       
 
         expiry = tc.convert_to_expiry(duration)
         if not expiry:
-            await interaction.response.send_message(f"❌ Invalid duration format: `{duration}` (use 1D | 2H | 30M | 1D2H30M)", ephemeral=True )
+            await interaction.followup.send(f"❌ Invalid duration format: `{duration}` (use 1D | 2H | 30M | 1D2H30M)", ephemeral=True )
             return
 
         Query.insert_activity(guild.id, event, expiry)
 
         notify = discord.Embed(title='📌 A new activity has been added!', description=f'**{event}** — expires in `{duration}`', color=discord.Color.dark_green())
         await config["get"].send('⟣┄ˑ◌ @everyone! \n ', embed=notify)
-        await interaction.response.send_message("✅ Activity added successfully!", ephemeral=True)
+        await interaction.followup.send("✅ Activity added successfully!", ephemeral=True)
 
 async def setup(bot):
     await bot.add_cog(Commands(bot))
