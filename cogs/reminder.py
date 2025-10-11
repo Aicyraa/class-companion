@@ -29,9 +29,9 @@ class Reminder(commands.Cog):
         counter = 1        
         _, __, today = datetime.now(self.ph_time).strftime("%H %M %A").split(' ') # for fetching the current time hours, minutes day
         hours, minutes = int(_), int(__)
-        print(hours)
-        if hours in [0, 6, 12] and minutes == 0 and not self.schedule_stopper :
-            self.stopper = True 
+    
+        if hours in [0, 6, 12] and minutes < 59 and not self.schedule_stopper :
+            self.schedule_stopper = True 
             result = query.schedule_remind()
             
             for user_id, event in result.items():
@@ -58,6 +58,7 @@ class Reminder(commands.Cog):
         hours, minutes = int(_), int(__)
         
         if hours in [0, 6, 12] and minutes == 0 and not self.remind_activites:
+            self.activity_stopper = True
             for guild_id, events in query.activity_remind().items():
                 
                 guild = await self.bot.fetch_guild(guild_id) 

@@ -53,7 +53,7 @@ class Query:
                 if not qeury_result:
                     continue
                 
-                schedule = [f'{str(sched[0])} {str(rq.convert_to_12(sched[1]))}' for sched in qeury_result]
+                schedule = [f'{str(sched[0])} - {str(rq.convert_to_12(sched[1]))}' for sched in qeury_result]
                 result[day] = schedule
 
             return result
@@ -95,11 +95,12 @@ class Query:
         
         try:
             cursor.execute(f'USE {Settings.db}')
-            cursor.execute('SELECT  FROM schedules WHERE user_discord_id = %s AND event_day = %s AND event = %s AND event_time = %s; ''', (author, day, event, time))
+            cursor.execute('SELECT * FROM schedules WHERE user_discord_id = %s AND event_day = %s AND event = %s AND event_time = %s; ''', (author, day, event, time))
             if cursor.fetchone():
                 cursor.execute('''DELETE FROM schedules WHERE user_discord_id = %s AND event_day = %s AND event = %s AND event_time = %s; ''', (author, day, event, time))
                 cnx.commit()
                 return True
+            
         
         except sql.Error as err: print(f'Error occur deleting the schedule: {err}')
         finally:
