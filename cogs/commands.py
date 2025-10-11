@@ -4,7 +4,7 @@ from datetime import datetime
 from discord.ext import commands
 from discord import app_commands
 from utils.sql_func_helpers import Query
-from utils.sql_func_reminder import Reminder_Query
+from utils.time_converter import Time_Converter as tc
 
 # Config file
 
@@ -22,11 +22,11 @@ class Commands(commands.Cog):
 
         guide = discord.Embed(title="📍 Class Companion Commands", description="""Use the `//` prefix before the command """, color=discord.Colour.blurple())
         guide.set_footer(text="Class Companion", icon_url=self.bot.user.avatar)
-        guide.add_field(name="`schedule`", value='> followed by schedule\n> //schedule Day Event Time', inline=False)
+        guide.add_field(name="`schedule`", value='> followed by schedule\n> **//schedule Day Event Time**', inline=False)
         guide.add_field(name="`view`", value='> to view current schedule', inline=False)
-        guide.add_field(name="`update`", value='> to update\n> //update (old) Day Event Time - (new) Day Event Time', inline=False)
-        guide.add_field(name="`delete`", value='> to delete\n> Day Event Time', inline=False)
-        guide.add_field(name="`activity`", value='> for creating a new activity reminder\n> /activity event:Text duration:(1D, 1H, 10M)', inline=False)
+        guide.add_field(name="`update`", value='> to update\n> **//update (old) Day Event Time - (new) Day Event Time**', inline=False)
+        guide.add_field(name="`delete`", value='> to delete\n> **//delete Day Event Time**', inline=False)
+        guide.add_field(name="`activity`", value='> for creating a new activity reminder\n> **/activity event:Text duration: 1D | 1H | 10M | 1D1H10M)**', inline=False)
         guide.add_field(name="`quiz`", value='> for converting file to quiz', inline=False)
         await interaction.response.send_message(embed=guide)
 
@@ -45,7 +45,9 @@ class Commands(commands.Cog):
             return
 
         schedule_set = discord.Embed(title="⌛ Schedule is set!", description='', color=discord.Colour.og_blurple())
-
+        schedule_set.set_footer(text="Class Companion", icon_url=self.bot.user.avatar)
+        
+        
         for i in range(0, len(args), 3):
            
             userSchedule = args[i : i + 3]
@@ -69,8 +71,9 @@ class Commands(commands.Cog):
         schedule = Query.fetch(ctx.author.id)
         
         for day, events in schedule.items():
-            embed = discord.Embed(title=f'📌 **{day}** 📌', description=f'> {"\n > ".join(events)}', color=discord.Color.dark_gold())
-            await ctx.send(embed=embed, delete_after=1200)
+            view = discord.Embed(title=f'📌 **{day}** 📌', description=f'> **{"\n > ".join(events)}**', color=discord.Color.dark_gold())
+            view.set_footer(text="Class Companion", icon_url=self.bot.user.avatar)
+            await ctx.send(embed=view, delete_after=1200)
                  
     @commands.command()
     async def update(self, ctx, *args): # for update command
@@ -91,7 +94,7 @@ class Commands(commands.Cog):
         result = Query.edit(ctx.author.id, old.split(' '), new.split(' '))
         
         if result:
-            notify = discord.Embed(title='✅ Successfuly Updated!', description=f'> {old[0]} - {old[1]} - {old[2]} to {new[0]} - {new[1]} - {new[2]}', color=discord.Color.dark_green())
+            notify = discord.Embed(title='✅ ⟣┄ˑ◌ Successfuly Updated!', description=f'> {args[0]} {args[1]} {args[2]} to {args[4]} {args[5]} {args[6]}', color=discord.Color.dark_green())
             notify.set_footer(text="Class Companion", icon_url=self.bot.user.avatar)
             await ctx.send(embed=notify, delete_after=600)
             return     
@@ -109,17 +112,19 @@ class Commands(commands.Cog):
             await ctx.send(embed=guide, delete_after=600)
             return
         
-        result = Query.delete(ctx.author.id, args[0], args[1], datetime.strptime(args[2], "%I%p").time())
+        result = Query.delete(ctx.author.id, args[0], args[1], tc.convert_to_24(args[2]) )
         
         if result:
-            success = discord.Embed(title='✅ Successfuly deleted!', description=f'> {args[0]}-{args[1]}-{args[2]}', color=discord.Color.dark_green())
+            success = discord.Embed(title='✅ Successfuly deleted!', description=f'> {args[0]} - {args[1]} - {args[2]}', color=discord.Color.dark_green())
+            success.set_footer(text="Class Companion", icon_url=self.bot.user.avatar)   
             await ctx.send(embed=success, delete_after=600)
             return 
         
         error = discord.Embed(title='❌ Error while deleting!', description=f'Schedule does not match anything!',  color=discord.Color.dark_red()) # if hindi successful
+        error.set_footer(text="Class Companion", icon_url=self.bot.user.avatar)
         await ctx.send(embed=error, delete_after=600)
         
-    @app_commands.command(name='activity', description='Add an activity : /activity event:text duraition:(1D, 1H. 10M)')
+    @app_commands.command(name='activity', description='Add an activity : /activity event:text duraition: 1D | 2H | 30M | 1D2H30M')
     @app_commands.checks.has_permissions(administrator=True, manage_channels=True, manage_guild=True)
     async def activity(self, interaction: discord.Interaction, event: str, duration: str):
         guild = interaction.guild
@@ -152,14 +157,15 @@ class Commands(commands.Cog):
             await interaction.response.send_message(f'📌 {config["name"]} channel created!', ephemeral=True)
             return
 
-        expiry = Reminder_Query.convert_to_expiry(duration)
+        expiry = tc.convert_to_expiry(duration)
         if not expiry:
-            await interaction.response.send_message(f"❌ Invalid duration format: `{duration}` (use 1D, 2H, 30M)", ephemeral=True )
+            await interaction.response.send_message(f"❌ Invalid duration format: `{duration}` (use 1D | 2H | 30M | 1D2H30M)", ephemeral=True )
             return
 
         Query.insert_activity(guild.id, event, expiry)
 
-        await config["get"].send(f'📌 @everyone, a new activity has been added!\n**{event}** — expires in `{duration}`')
+        notify = discord.Embed(title='📌 A new activity has been added!', description=f'**{event}** — expires in `{duration}`', color=discord.Color.dark_green())
+        await config["get"].send('⟣┄ˑ◌ @everyone! \n ', embed=notify)
         await interaction.response.send_message("✅ Activity added successfully!", ephemeral=True)
 
 async def setup(bot):
