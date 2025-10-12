@@ -79,7 +79,7 @@ class Reminder(commands.Cog):
 
                     remind_activity = make_embed(
                         self.bot,
-                        title='🔔 **Reminder** 🔔',
+                        title='🔔⟣┄─⟣┄─ ** Reminder ** ┄─⟣┄─⟣ 🔔',
                         description=f'> Activity: **{text.capitalize()}**\n> Deadline: **{expiry_date}**',
                         color=discord.Colour.dark_gold(),
                         thumbnail='https://media1.giphy.com/media/v1.Y2lkPTc5MGI3NjExN3N6ZG0zODFmemo5YzdndHd3dW16cWwxMTVkZmN6czE4dGFoczY1OSZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/PefhJNutC9LVrmDFjx/giphy.gif'
@@ -90,7 +90,7 @@ class Reminder(commands.Cog):
                 mention = make_embed(
                     self.bot,
                     title=f"📌 @everyone as of {today}.",
-                    description="> These are the activities, check if you haven't done this activity yet.",
+                    description="> Here are the activities. Please check if you haven’t completed them yet.",
                     color=discord.Colour.dark_orange(),
                     image='https://cdn.dribbble.com/userupload/23917499/file/original-f0fec54e6c9d49c25c75e1b443f03b0b.gif'
                 )
