@@ -31,7 +31,7 @@ class Reminder(commands.Cog):
         _, __, today = datetime.now(self.ph_time).strftime("%H %M %A").split(' ')
         hours, minutes = int(_), int(__)
 
-        if hours in [0, 11, 12] and minutes < 59 and not self.schedule_stopper:
+        if hours in [0, 6, 12] and minutes < 59 and not self.schedule_stopper:
             self.schedule_stopper = True
             result = query.schedule_remind()
 
@@ -54,7 +54,7 @@ class Reminder(commands.Cog):
                 counter = 1
                 await user.send(embed=remind_schedule, delete_after=21600)
 
-        if hours not in [0, 11, 12]:
+        if hours not in [0, 6, 12]:
             self.schedule_stopper = False
 
     @tasks.loop(minutes=1)
@@ -62,7 +62,7 @@ class Reminder(commands.Cog):
         _, __, today = datetime.now(self.ph_time).strftime("%H %M %A").split(' ')
         hours, minutes = int(_), int(__)
 
-        if hours in [0, 10, 12] and minutes < 59 and not self.activity_stopper:
+        if hours in [0, 6, 12] and minutes < 59 and not self.activity_stopper:
             self.activity_stopper = True
 
             for guild_id, events in query.activity_remind().items():
@@ -98,7 +98,7 @@ class Reminder(commands.Cog):
                 await channel.send(embed=mention, delete_after=21600)
                 await channel.send('@everyone❗', delete_after=21600)
 
-        if hours not in [0, 10, 12]:
+        if hours not in [0, 6, 12]:
             self.activity_stopper = False
 
     @tasks.loop(minutes=1)
