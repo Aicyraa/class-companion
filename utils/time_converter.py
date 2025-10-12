@@ -19,8 +19,8 @@ class Time_Converter():
         
         hours_12 = hours_24 % 12 or 12   # ensures always positive, converts correctly
         ampm = "AM" if hours_24 < 12 else "PM"
-        format = f"{hours_12:2d}:{minutes:02d} {ampm}"
-        return format
+        return f"{hours_12:2d}:{minutes:02d} {ampm}"
+        
     
     @staticmethod
     def convert_to_expiry(duration: str) -> datetime:
