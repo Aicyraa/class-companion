@@ -21,6 +21,7 @@ class Commands(commands.Cog):
     async def showCmd(self, interaction: discord.Interaction):
 
         guide = make_embed(
+            self.bot,
             title="📍 Class Companion Commands",
             description="Use the `//` prefix before the command",
             color=discord.Color.blurple()
@@ -38,11 +39,12 @@ class Commands(commands.Cog):
     @commands.command()
     async def schedule(self, ctx, *args):
         if ctx.guild is not None:
-            notify = make_embed(title=f"{ctx.author.display_name or ctx.author.name}", description="A message has been sent to you!", color=discord.Color.og_blurple())
+            notify = make_embed(self.bot, title=f"{ctx.author.display_name or ctx.author.name}", description="A message has been sent to you!", color=discord.Color.og_blurple())
             await ctx.send(embed=notify, delete_after=1200)
 
         if not args or len(args) < 2:
             guide = make_embed(
+                self.bot,
                 "🗺️ Schedule Command Guide",
                 "**⟣ˑ◌ The command `schedule` should be followed by your schedule in `DST` format. "
                 "You can add multiple schedules separated by space.**\n\n"
@@ -69,10 +71,10 @@ class Commands(commands.Cog):
 
             Query.insert_schedule(ctx.author.id, userSchedule)
             day, subj, time = userSchedule
-            lines.append(f'`𖥔 {day.upper()}`:  {subj}\n> Time:  {time} \n')
+            lines.append(f'𖥔 {day.upper()}:  **{subj}**\n> Time:  **{time}** \n')
 
         if lines:
-            schedule_set = make_embed("⌛ Schedule is set!", lines, discord.Color.og_blurple())
+            schedule_set = make_embed(self.bot, "⟣┄─ ⌛ Schedule is set!", lines, discord.Color.og_blurple())
             await ctx.author.send(embed=schedule_set, delete_after=3600)
       
     @commands.command()
@@ -80,13 +82,14 @@ class Commands(commands.Cog):
         schedule = Query.fetch(ctx.author.id)
 
         for day, events in schedule.items():
-            view = make_embed(f'⟣┄─⟣┄─ **{day}** ┄─⟣┄─⟣', [f"**{event}**" for event in events], discord.Color.dark_gold())
+            view = make_embed(self.bot, f'⟣┄─⟣┄─ **{day}** ┄─⟣┄─⟣', [f"**{event}**" for event in events], discord.Color.dark_gold())
             await ctx.send(embed=view, delete_after=1200)
 
     @commands.command()
     async def update(self, ctx, *args):
         if not args or len(args) < 2:
             guide = make_embed(
+                self.bot,
                 "🗺️ Update Command Guide",
                 "**⟣ˑ◌ The command `update` should be followed by `(OLD) DET - DET (NEW)` format.**\n\n"
                 "`𖥔 Day Event Time`",
@@ -98,7 +101,7 @@ class Commands(commands.Cog):
 
         joined_args = " ".join(args)
         if " - " not in joined_args:
-            error = make_embed("⟣┄─ ૮ Error: Invalid format! ❌", '', discord.Color.dark_red())
+            error = make_embed(self.bot, "⟣┄─ ૮ Error: Invalid format! ❌", '', discord.Color.dark_red())
             await ctx.send(embed=error, delete_after=1200)
             return
 
@@ -106,7 +109,7 @@ class Commands(commands.Cog):
         result = Query.edit(ctx.author.id, old.split(), new.split())
 
         if result:
-            notify = make_embed("⟣┄─ ૮ Successfully Updated! ✅", f'> {" ".join(args)}', discord.Color.dark_green())
+            notify = make_embed(self.bot, "⟣┄─ ૮ Successfully Updated! ✅", f'> {" ".join(args)}', discord.Color.dark_green())
             await ctx.send(embed=notify, delete_after=1200)
         else:
             error = make_embed("⟣┄─ ૮ Error while updating! ❌", "Schedule does not match anything!", discord.Color.dark_red())
@@ -116,6 +119,7 @@ class Commands(commands.Cog):
     async def delete(self, ctx, *args):
         if not args or len(args) < 3:
             guide = make_embed(
+                self.bot,
                 "🗺️ Delete Command Guide",
                 "**⟣ˑ◌ The command `delete` should be followed by the User Schedule in `DET` format.**\n\n"
                 "`𖥔 Day Event Time`",
@@ -128,20 +132,17 @@ class Commands(commands.Cog):
         result = Query.delete(ctx.author.id, args[0], args[1], tc.convert_to_24(args[2]))
 
         if result:
-            success = make_embed("⟣┄─ ૮ Successfully deleted! ✅", f'> {args[0]} - {args[1]} - {args[2]}', discord.Color.dark_green())
+            success = make_embed(self.bot, "⟣┄─ ૮ Successfully deleted! ✅", f'> {args[0]} - {args[1]} - {args[2]}', discord.Color.dark_green())
             await ctx.send(embed=success, delete_after=1200)
         else:
-            error = make_embed("⟣┄─ ૮ Error while deleting! ❌", "Schedule does not match anything!", discord.Color.dark_red())
+            error = make_embed(self.bot, "⟣┄─ ૮ Error while deleting! ❌", "Schedule does not match anything!", discord.Color.dark_red())
             await ctx.send(embed=error, delete_after=1200)
 
-    @app_commands.command(
-        name='activity',
-        description='Add an activity : /activity event:text duration: 1D | 2H | 30M | 1D2H30M'
-    )
+    @app_commands.command(name='activity', description='Add an activity : /activity event:text duration: 1D | 2H | 30M | 1D2H30M')
     @app_commands.checks.has_permissions(administrator=True)
     async def activity(self, interaction: discord.Interaction, event: str, duration: str):
         guild = interaction.guild
-        channel_name = "《🔔》event-schedule"
+        channel_name = "《🔔》presentation-event-schedule"
         event_channel = discord.utils.get(guild.text_channels, name=channel_name)
 
         # Defer immediately — gives you more control over follow-ups later

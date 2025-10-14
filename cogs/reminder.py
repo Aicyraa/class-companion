@@ -31,7 +31,7 @@ class Reminder(commands.Cog):
         _, __, today = datetime.now(self.ph_time).strftime("%H %M %A").split(' ')
         hours, minutes = int(_), int(__)
 
-        if hours in [0, 6, 12] and minutes < 59 and not self.schedule_stopper:
+        if hours in [0, 6, 12] and minutes == 0 and not self.schedule_stopper:
             self.schedule_stopper = True
             result = query.schedule_remind()
 
@@ -62,13 +62,13 @@ class Reminder(commands.Cog):
         _, __, today = datetime.now(self.ph_time).strftime("%H %M %A").split(' ')
         hours, minutes = int(_), int(__)
 
-        if hours in [0, 6, 12] and minutes < 59 and not self.activity_stopper:
+        if hours in [0, 6, 12] and minutes == 0 and not self.activity_stopper:
             self.activity_stopper = True
 
             for guild_id, events in query.activity_remind().items():
                 guild = await self.bot.fetch_guild(guild_id)
                 fetch_channel = await guild.fetch_channels()
-                channel = discord.utils.get(fetch_channel, name="《🔔》event-schedule")
+                channel = discord.utils.get(fetch_channel, name="《🔔》presentation-event-schedule")
 
                 if not channel:
                     continue

@@ -25,3 +25,4 @@
 
 credits for photo / icon of the bot
 > rahmatnurohman3881
+> davidswidjaja
