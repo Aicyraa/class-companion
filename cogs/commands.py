@@ -18,7 +18,7 @@ class Commands(commands.Cog):
             return
 
     @app_commands.command(name="show_command", description="For displaying the available commands")
-    async def showCmd(self, interaction: discord.Interaction):
+    async def showCmd(self, interaction: discord.Interaction): # rod
 
         guide = make_embed(
             self.bot,
@@ -33,11 +33,11 @@ class Commands(commands.Cog):
         guide.add_field(name="`delete`", value='> to delete\n> **//delete Day Event Time**', inline=False)
         guide.add_field(name="`activity`", value='> create a new activity reminder\n> **/activity event:Text duration:1D | 1H | 10M | 1D1H10M**', inline=False)
         guide.add_field(name="`quiz`", value='> convert file to quiz', inline=False)
-
+        
         await interaction.response.send_message(embed=guide, delete_after=1200)
 
     @commands.command()
-    async def schedule(self, ctx, *args):
+    async def schedule(self, ctx, *args): # isaiah
         if ctx.guild is not None:
             notify = make_embed(self.bot, title=f"{ctx.author.display_name or ctx.author.name}", description="A message has been sent to you!", color=discord.Color.og_blurple())
             await ctx.send(embed=notify, delete_after=1200)
@@ -52,6 +52,7 @@ class Commands(commands.Cog):
                 "`𖥔 Time`: 12-hour AM/PM format (e.g. 1PM | 1:35PM)",
                 color=discord.Color.og_blurple()
             )
+            
             guide.set_thumbnail(url=self.bot.user.avatar)
             await ctx.author.send(embed=guide, delete_after=3600)
             return
@@ -68,17 +69,17 @@ class Commands(commands.Cog):
             if not re.match(r"^(0?[1-9]|1[0-2])(:[0-5][0-9])?(AM|PM)$", userSchedule[2].strip().upper()):
                 await ctx.author.send( f"❌ Invalid time format: `{userSchedule[2]}`. Use `1PM`, `1:00PM`, or `11:30PM`.", delete_after=60)
                 continue
-
+            
             Query.insert_schedule(ctx.author.id, userSchedule)
             day, subj, time = userSchedule
-            lines.append(f'𖥔 {day.upper()}:  **{subj}**\n> Time:  **{time}** \n')
+            lines.append(f'𖥔 {day.upper()}:  **{subj}**\n> 𖥔Time:  **{time}** \n')
 
         if lines:
             schedule_set = make_embed(self.bot, "⟣┄─ ⌛ Schedule is set!", lines, discord.Color.og_blurple())
             await ctx.author.send(embed=schedule_set, delete_after=3600)
       
     @commands.command()
-    async def view(self, ctx):
+    async def view(self, ctx): # ck
         schedule = Query.fetch(ctx.author.id)
 
         for day, events in schedule.items():
@@ -86,7 +87,7 @@ class Commands(commands.Cog):
             await ctx.send(embed=view, delete_after=1200)
 
     @commands.command()
-    async def update(self, ctx, *args):
+    async def update(self, ctx, *args): # ares
         if not args or len(args) < 2:
             guide = make_embed(
                 self.bot,
@@ -116,7 +117,7 @@ class Commands(commands.Cog):
             await ctx.send(embed=error, delete_after=1200)
 
     @commands.command()
-    async def delete(self, ctx, *args):
+    async def delete(self, ctx, *args): # kenneth
         if not args or len(args) < 3:
             guide = make_embed(
                 self.bot,
@@ -140,9 +141,9 @@ class Commands(commands.Cog):
 
     @app_commands.command(name='activity', description='Add an activity : /activity event:text duration: 1D | 2H | 30M | 1D2H30M')
     @app_commands.checks.has_permissions(administrator=True)
-    async def activity(self, interaction: discord.Interaction, event: str, duration: str):
+    async def activity(self, interaction: discord.Interaction, event: str, duration: str): # jee
         guild = interaction.guild
-        channel_name = "《🔔》presentation-event-schedule"
+        channel_name = "《🔔》event-schedule"
         event_channel = discord.utils.get(guild.text_channels, name=channel_name)
 
         # Defer immediately — gives you more control over follow-ups later

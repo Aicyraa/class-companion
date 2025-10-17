@@ -31,7 +31,7 @@ class Reminder(commands.Cog):
         _, __, today = datetime.now(self.ph_time).strftime("%H %M %A").split(' ')
         hours, minutes = int(_), int(__)
 
-        if hours in [0, 6, 12] and minutes == 0 and not self.schedule_stopper:
+        if hours in [0, 6, 13] and minutes < 59 and not self.schedule_stopper:
             self.schedule_stopper = True
             result = query.schedule_remind()
 
@@ -46,7 +46,7 @@ class Reminder(commands.Cog):
                     color=discord.Color.brand_red(),
                     image='http://bestanimations.com/HomeOffice/Clocks/Alarm/funny-alarm-clock-animated-gif-2.gif'
                 )
-
+    
                 for schedule in event:
                     remind_schedule.add_field(name=f'**`Schedule {counter}`** ⏰', value=f'> Time: **{schedule[1].lstrip("0")}**\n> Schedule: **{schedule[0]}**', inline=False)
                     counter += 1
@@ -54,7 +54,7 @@ class Reminder(commands.Cog):
                 counter = 1
                 await user.send(embed=remind_schedule, delete_after=21600)
 
-        if hours not in [0, 6, 12]:
+        if hours not in [0, 6, 13]:
             self.schedule_stopper = False
 
     @tasks.loop(minutes=1)
@@ -62,13 +62,13 @@ class Reminder(commands.Cog):
         _, __, today = datetime.now(self.ph_time).strftime("%H %M %A").split(' ')
         hours, minutes = int(_), int(__)
 
-        if hours in [0, 6, 12] and minutes == 0 and not self.activity_stopper:
+        if hours in [0, 6, 13] and minutes < 59 and not self.activity_stopper:
             self.activity_stopper = True
 
             for guild_id, events in query.activity_remind().items():
                 guild = await self.bot.fetch_guild(guild_id)
                 fetch_channel = await guild.fetch_channels()
-                channel = discord.utils.get(fetch_channel, name="《🔔》presentation-event-schedule")
+                channel = discord.utils.get(fetch_channel, name="《🔔》event-schedule")
 
                 if not channel:
                     continue
@@ -98,7 +98,7 @@ class Reminder(commands.Cog):
                 await channel.send(embed=mention, delete_after=21600)
                 await channel.send('@everyone❗', delete_after=21600)
 
-        if hours not in [0, 6, 12]:
+        if hours not in [0, 6, 13]:
             self.activity_stopper = False
 
     @tasks.loop(minutes=1)
