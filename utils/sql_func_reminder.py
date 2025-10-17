@@ -21,9 +21,9 @@ class Reminder_Query:
         try:
             cursor.execute(f'USE {Settings.db}')
             cursor.execute('SELECT user_discord_id FROM user')
-            
             for (user,) in cursor.fetchall():
                 storage = []
+                
                 cursor.execute(
                     """
                     SELECT schedules.event, schedules.event_time FROM schedules
@@ -37,11 +37,11 @@ class Reminder_Query:
                     print('details => ', details)
                     storage.append(details)
                 
-                print('storage => ', storage)
                 if not storage: # prevents from sending notification if there is no schedule
                     continue
                 
                 result[user] = storage # added event to result dict
+                print('storage => ', storage)
 
         except sql.Error as err: print(f'Error occur while fetching schedule: {err}')
         finally:
@@ -97,11 +97,11 @@ class Reminder_Query:
             cursor.execute(f'''USE {Settings.db}''')
             cursor.execute('''DELETE FROM activities WHERE expiry_date <= NOW(); ''')
             cnx.commit()
+            
         except sql.Error as err: print(f'Error occur while deleting {err}')
         finally:
             cursor.close()
             cnx.close()
 
-    # for time convertion
     
    
