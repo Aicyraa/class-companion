@@ -2,7 +2,6 @@ import discord
 import logging 
 import os
 import asyncio
-from flask import Flask
 from threading import Thread
 from discord.ext import commands
 from utils.sql_func_checker import Checker
@@ -18,7 +17,6 @@ logging.basicConfig(
     ]
 )
 
-app = Flask('') # for hosting
 logger = logging.getLogger("discord")   
 
 intents = discord.Intents.default()
@@ -33,25 +31,13 @@ async def load():
             
 async def main():
     
-    await Checker.check_db( Settings.db) # for checking the database
+    await Checker.check_db(Settings.db) # for checking the database
     await Checker.check_table() # for checking the table
     await load() # loading cogs
     await bot.start(Settings.token, reconnect=True)
 
     Settings.connection().close()
     
-@app.route('/')
-def home():
-    return "I'm alive"
-
-def run():
-    app.run(host='0.0.0.0', port=8080)
-
-def keep_alive():
-    t = Thread(target=run)
-    t.start()
-    
 if __name__ == "__main__":
-    keep_alive()
     asyncio.run(main())
      
